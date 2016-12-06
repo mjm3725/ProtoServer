@@ -1,15 +1,13 @@
 #pragma once
 
-#include "asio.hpp"
+#include "SessionFactoryBase.h"
 
 using asio::ip::tcp;
-
-class ISessionFactory;
 
 class TCPServer
 {
 public:
-	TCPServer(asio::io_service& ioService, int port, ISessionFactory& sessionFactory);
+	TCPServer(asio::io_service& ioService, int port, shared_ptr<SessionFactoryBase>& sessionFactory);
 
 	void Start();
 
@@ -18,6 +16,6 @@ private:
 
 	tcp::acceptor m_acceptor;
 	tcp::socket m_socket;
-	ISessionFactory& m_sessionFactory;
+	shared_ptr<SessionFactoryBase> m_sessionFactory;
 };
 

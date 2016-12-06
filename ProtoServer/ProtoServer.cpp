@@ -7,10 +7,14 @@
 
 int main()
 {
-	asio::io_service ioService;
-	ChatSessionFactory chatSessionFactory;
+	int port = 10000;
 
-	TCPServer server(ioService, 10000, chatSessionFactory);
+	LogHelper::Instance.GetConsoleLogger()->info("Start server");
+	LogHelper::Instance.GetConsoleLogger()->info("Port : {}", port);
+	
+	asio::io_service ioService;
+
+	TCPServer server(ioService, port, static_pointer_cast<SessionFactoryBase>(make_shared<ChatSessionFactory>()));
 	server.Start();
 
 	ioService.run();

@@ -1,11 +1,9 @@
 #pragma once
 
-#include "Network\ISessionFactory.h"
+#include "Network\SessionFactoryBase.h"
 
-using namespace std;
-
-class ChatSessionFactory : public ISessionFactory
+class ChatSessionFactory : public SessionFactoryBase
 {
 public:
-	shared_ptr<SessionBase> CreateSession(tcp::socket& socket) override;
+	shared_ptr<SessionBase> DoCreateSession(int64_t handle, tcp::socket& socket) override;
 };

@@ -2,10 +2,11 @@
 
 #include "Network/SessionBase.h"
 
+
 class ChatSession :	public SessionBase
 {
 public:
-	ChatSession(tcp::socket& socket);
+	ChatSession(int64_t handle, tcp::socket& socket, SessionFactoryBase* sessionManager);
 	~ChatSession();
 
 	void OnConnect() override;

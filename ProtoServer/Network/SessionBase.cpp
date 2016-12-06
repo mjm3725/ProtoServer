@@ -1,12 +1,13 @@
 #include "stdafx.h"
 #include "SessionBase.h"
-#include <memory>
-#include <iostream>
+#include "SessionFactoryBase.h"
 
-
-SessionBase::SessionBase(tcp::socket& socket) :
-	m_socket(std::move(socket))
+SessionBase::SessionBase(int64_t handle, tcp::socket& socket, SessionFactoryBase* sessionFactory)
+	: m_handle(handle),
+	m_socket(std::move(socket)),
+	m_sessionFactory(sessionFactory)
 {
+
 }
 
 SessionBase::~SessionBase()
@@ -22,6 +23,11 @@ void SessionBase::OnConnect()
 void SessionBase::OnDisconnect()
 {
 
+}
+
+int64_t SessionBase::GetHandle()
+{
+	return m_handle;
 }
 
 int SessionBase::OnRecv(asio::const_buffer& buf)
@@ -111,7 +117,8 @@ void SessionBase::DoRecv()
 		else
 		{
 			cout << "recv error : " << ec.message() << endl;
-
+			
+			session->m_sessionFactory->ReleaseSession(session->GetHandle());
 			session->OnDisconnect();
 			session->m_socket.close();
 		}

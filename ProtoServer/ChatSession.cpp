@@ -1,11 +1,8 @@
 #include "stdafx.h"
 #include "ChatSession.h"
-#include <iostream>
-#include <array>
+#include "Network/SessionFactoryBase.h"
 
-using namespace std;
-
-ChatSession::ChatSession(tcp::socket& socket) : SessionBase(socket)
+ChatSession::ChatSession(int64_t handle, tcp::socket& socket, SessionFactoryBase* sessionManager) : SessionBase(handle, socket, sessionManager)
 {
 }
 
@@ -37,7 +34,10 @@ int ChatSession::OnRecv(asio::const_buffer& buf)
 
 			cout << "chat: " << s;
 
-			Send(data, i + 1);
+			m_sessionFactory->VisitSession([&s](auto session)
+			{
+				session->Send(s.data(), static_cast<int>(s.length()));
+			});
 
 			return i + 1;
 		}

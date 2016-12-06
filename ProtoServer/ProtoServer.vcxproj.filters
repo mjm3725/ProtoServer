@@ -12,15 +12,18 @@
     <Filter Include="소스 파일\Network">
       <UniqueIdentifier>{d4bfc784-1a2b-41c2-9aab-797003af7eb9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Test">
+      <UniqueIdentifier>{bc6251ae-ab53-4e56-a354-69294018c404}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Util">
+      <UniqueIdentifier>{40411316-f01c-4f6d-b4da-89c8a24a6887}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Network\TCPServer.h">
-      <Filter>소스 파일\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="Network\ISessionFactory.h">
       <Filter>소스 파일\Network</Filter>
     </ClInclude>
     <ClInclude Include="Network\SessionBase.h">
@@ -32,11 +35,17 @@
     <ClInclude Include="targetver.h">
       <Filter>소스 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Network\SessionFactoryBase.h">
+      <Filter>소스 파일\Network</Filter>
+    </ClInclude>
     <ClInclude Include="ChatSession.h">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Test</Filter>
     </ClInclude>
     <ClInclude Include="ChatSessionFactory.h">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Test</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\LogHelper.h">
+      <Filter>소스 파일\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -52,11 +61,17 @@
     <ClCompile Include="Network\SessionBase.cpp">
       <Filter>소스 파일\Network</Filter>
     </ClCompile>
+    <ClCompile Include="Network\SessionFactoryBase.cpp">
+      <Filter>소스 파일\Network</Filter>
+    </ClCompile>
     <ClCompile Include="ChatSession.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Test</Filter>
     </ClCompile>
     <ClCompile Include="ChatSessionFactory.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Test</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\LogHelper.cpp">
+      <Filter>소스 파일\Util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

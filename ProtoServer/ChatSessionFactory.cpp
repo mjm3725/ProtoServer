@@ -3,7 +3,7 @@
 #include "ChatSession.h"
 
 
-shared_ptr<SessionBase> ChatSessionFactory::CreateSession(tcp::socket& socket)
+shared_ptr<SessionBase> ChatSessionFactory::DoCreateSession(int64_t handle, tcp::socket& socket)
 {
-	return make_shared<ChatSession>(socket);
+	return make_shared<ChatSession>(handle, socket, this);
 }

@@ -1,11 +1,8 @@
 #pragma once
 
-#include "asio.hpp"
-#include <mutex>
-
 using asio::ip::tcp;
-using namespace std;
 
+class SessionFactoryBase;
 
 class SessionBase : public enable_shared_from_this<SessionBase>
 {
@@ -16,8 +13,7 @@ public:
 		SEND_BUF_SIZE = 8192,
 	};
 
-	SessionBase(tcp::socket& socket);
-
+	SessionBase(int64_t handle, tcp::socket& socket, SessionFactoryBase* sessionFactory);
 	virtual ~SessionBase();
 
 	virtual void OnConnect();
@@ -29,10 +25,13 @@ public:
 
 	void Send(const void* data, int size);
 
+	int64_t GetHandle();
+
 protected:
 	tcp::socket m_socket;
 	asio::streambuf m_recvBuf;
 	asio::streambuf m_sendBuf;
-
 	mutex m_lock;
+	int64_t m_handle;
+	SessionFactoryBase* m_sessionFactory;
 };
