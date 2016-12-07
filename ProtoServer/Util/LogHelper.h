@@ -6,12 +6,14 @@
 class LogHelper
 {
 public:
-	static LogHelper Instance;
+	static LogHelper* GetInstance();
 
-	LogHelper();
-	
 	shared_ptr<spdlog::logger>& GetConsoleLogger();
 
 private:
+	static LogHelper s_instance;;
+
+	LogHelper();
+
 	shared_ptr<spdlog::logger> m_consoleLog;
 };

@@ -9,8 +9,8 @@ int main()
 {
 	int port = 10000;
 
-	LogHelper::Instance.GetConsoleLogger()->info("Start server");
-	LogHelper::Instance.GetConsoleLogger()->info("Port : {}", port);
+	LogHelper::GetInstance()->GetConsoleLogger()->info("Start server");
+	LogHelper::GetInstance()->GetConsoleLogger()->info("Port : {}", port);
 	
 	asio::io_service ioService;
 
