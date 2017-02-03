@@ -28,11 +28,11 @@ int ChatSession::OnRecv(asio::const_buffer& buf)
 
 	for (int i = 0; i < size; i++)
 	{
-		if (data[i] == '\n')
+		if (data[i] == '\0')
 		{
 			string s(data, i + 1);
 
-			cout << "chat: " << s;
+			cout << "chat: " << s << endl;
 
 			m_sessionFactory->VisitSession([&s](auto session)
 			{
