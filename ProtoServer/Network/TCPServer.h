@@ -1,21 +1,39 @@
 #pragma once
 
-#include "SessionFactoryBase.h"
+#include "IProtocolFilter.h"
+
 
 using asio::ip::tcp;
+
+class SessionBase;
+
 
 class TCPServer
 {
 public:
-	TCPServer(asio::io_service& ioService, int port, shared_ptr<SessionFactoryBase>& sessionFactory);
+	void Start(int thread_num, int port, shared_ptr<IProtocolFilter>& protocol_filter);
+	void Stop();
 
-	void Start();
+	void VisitSession(function<void(shared_ptr<SessionBase>&)> visitFunc);
+
+	virtual shared_ptr<SessionBase> CreateSession() = 0;
 
 private:
+	void AddSession(shared_ptr<SessionBase>& session);
+	void DeleteSession(int64_t handle);
+
 	void DoAccept();
 
-	tcp::acceptor m_acceptor;
-	tcp::socket m_socket;
-	shared_ptr<SessionFactoryBase> m_sessionFactory;
+	shared_ptr<tcp::acceptor> acceptor_;
+	shared_ptr<IProtocolFilter> protocol_filter_;
+	asio::io_service io_service_;
+	vector<shared_ptr<thread>> threads_;
+
+	atomic<int64_t> current_handle_;
+
+	typedef unordered_map<int64_t, shared_ptr<SessionBase>>::value_type SessionMapValueType;
+	unordered_map<int64_t, shared_ptr<SessionBase>> session_map_;
+
+	mutex lock_;
 };
 

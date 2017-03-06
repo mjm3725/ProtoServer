@@ -2,7 +2,7 @@
 
 using asio::ip::tcp;
 
-class SessionFactoryBase;
+class TCPServer;
 
 class SessionBase : public enable_shared_from_this<SessionBase>
 {
@@ -13,8 +13,7 @@ public:
 		SEND_BUF_SIZE = 8192,
 	};
 
-	SessionBase(int64_t handle, tcp::socket& socket, SessionFactoryBase* sessionFactory);
-	virtual ~SessionBase();
+	void Initialize(int64_t handle, shared_ptr<tcp::socket>& socket, TCPServer* server, function<void(int64_t)> on_closed);
 
 	virtual void OnConnect();
 	virtual void OnDisconnect();
@@ -28,10 +27,11 @@ public:
 	int64_t GetHandle();
 
 protected:
-	tcp::socket m_socket;
-	asio::streambuf m_recvBuf;
-	asio::streambuf m_sendBuf;
-	mutex m_lock;
-	int64_t m_handle;
-	SessionFactoryBase* m_sessionFactory;
+	shared_ptr<tcp::socket> socket_;
+	asio::streambuf recv_buf_;
+	asio::streambuf send_buf_;
+	mutex send_buf_lock_;
+	int64_t handle_;
+	TCPServer* server_;
+	function<void(int64_t)> on_closed_;
 };

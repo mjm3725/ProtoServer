@@ -1,18 +1,14 @@
 #include "stdafx.h"
 #include "SessionBase.h"
-#include "SessionFactoryBase.h"
+#include "TCPServer.h"
 
-SessionBase::SessionBase(int64_t handle, tcp::socket& socket, SessionFactoryBase* sessionFactory)
-	: m_handle(handle),
-	m_socket(std::move(socket)),
-	m_sessionFactory(sessionFactory)
+
+void SessionBase::Initialize(int64_t handle, shared_ptr<tcp::socket>& socket, TCPServer* server, function<void(int64_t)> on_closed)
 {
-
-}
-
-SessionBase::~SessionBase()
-{
-
+	handle_ = handle;
+	socket_ = socket;
+	server_ = server;
+	on_closed_ = on_closed;
 }
 
 void SessionBase::OnConnect()
@@ -27,7 +23,7 @@ void SessionBase::OnDisconnect()
 
 int64_t SessionBase::GetHandle()
 {
-	return m_handle;
+	return handle_;
 }
 
 int SessionBase::OnRecv(asio::const_buffer& buf)
@@ -37,14 +33,14 @@ int SessionBase::OnRecv(asio::const_buffer& buf)
 
 void SessionBase::Send(const void* data, int size)
 {
-	lock_guard<mutex> lock(m_lock);
+	lock_guard<mutex> lock(send_buf_lock_);
 
-	size_t sendBufSize = m_sendBuf.size();
+	size_t sendBufSize = send_buf_.size();
 
 	if (sendBufSize + size > SEND_BUF_SIZE)
 	{
 		cout << "send buffer full" << endl;
-		m_socket.close();
+		socket_->close();
 		return;
 	}
 
@@ -55,11 +51,11 @@ void SessionBase::Send(const void* data, int size)
 		isSend = true;
 	}
 	
-	auto buf = m_sendBuf.prepare(SEND_BUF_SIZE - sendBufSize);
+	auto buf = send_buf_.prepare(SEND_BUF_SIZE - sendBufSize);
 
 	asio::buffer_copy(buf, asio::buffer(data, size));
 
-	m_sendBuf.commit(size);
+	send_buf_.commit(size);
 
 	if (isSend)
 	{
@@ -69,25 +65,22 @@ void SessionBase::Send(const void* data, int size)
 
 void SessionBase::DoSend()
 {
-	m_socket.async_send(m_sendBuf.data(), [session = shared_from_this()](error_code ec, size_t bytesTransferred)
+	socket_->async_send(send_buf_.data(), [session = shared_from_this()](error_code ec, size_t bytesTransferred)
 	{
-		cout << "sendbyte : " << bytesTransferred << endl;
-
 		if (!ec)
 		{
-			lock_guard<mutex> lock(session->m_lock);
+			lock_guard<mutex> lock(session->send_buf_lock_);
 
-			session->m_sendBuf.consume(bytesTransferred);
+			session->send_buf_.consume(bytesTransferred);
 
-			if (session->m_sendBuf.size() > 0)
+			if (session->send_buf_.size() > 0)
 			{
 				session->DoSend();
 			}
 		}
 		else
 		{
-			cout << "send error : " << ec.message() << endl;
-			session->m_socket.close();
+			session->socket_->close();
 		}
 	});
 }
@@ -95,32 +88,28 @@ void SessionBase::DoSend()
 void SessionBase::DoRecv()
 {
 	// resize안되게 남은 input buffer크기만큼만 prepare함
-	auto buf = m_recvBuf.prepare(RECV_BUF_SIZE - m_recvBuf.size());
+	auto buf = recv_buf_.prepare(RECV_BUF_SIZE - recv_buf_.size());
 
-	m_socket.async_receive(buf, [session = shared_from_this()](error_code ec, size_t bytesTransferred)
+	socket_->async_receive(buf, [session = shared_from_this()](error_code ec, size_t bytesTransferred)
 	{
-		cout << "recvbyte : " << bytesTransferred << endl;
-
 		if (!ec)
 		{
-			session->m_recvBuf.commit(bytesTransferred);
+			session->recv_buf_.commit(bytesTransferred);
 
-			size_t readSize = session->OnRecv(session->m_recvBuf.data());
+			size_t readSize = session->OnRecv(session->recv_buf_.data());
 			
 			if (readSize > 0)
 			{
-				session->m_recvBuf.consume(readSize);
+				session->recv_buf_.consume(readSize);
 			}
 
 			session->DoRecv();
 		}
 		else
 		{
-			cout << "recv error : " << ec.message() << endl;
-			
-			session->m_sessionFactory->ReleaseSession(session->GetHandle());
+			session->on_closed_(session->GetHandle());
 			session->OnDisconnect();
-			session->m_socket.close();
+			session->socket_->close();
 		}
 	});
 }

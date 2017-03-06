@@ -2,27 +2,33 @@
 //
 
 #include "stdafx.h"
-#include "Network/TCPServer.h"
-#include "ChatSessionFactory.h"
+#include "ChatServer.h"
+#include "Network\NullTerminateProtocolFilter.h"
 
 int main()
 {
-	int port = 10000;
+	int port = 8080;
 
 	LogHelper::GetInstance()->GetConsoleLogger()->info("Start server");
 	LogHelper::GetInstance()->GetConsoleLogger()->info("Port : {}", port);
+	LogHelper::GetInstance()->GetConsoleLogger()->info("IO Thread num : {}", 8);
 	
-	asio::io_service ioService;
-
-	TCPServer server(ioService, port, static_pointer_cast<SessionFactoryBase>(make_shared<ChatSessionFactory>()));
-	server.Start();
-
-	ioService.run();
+	ChatServer server;
+	server.Start(8, port, static_pointer_cast<IProtocolFilter>(make_shared<NullTerminateProtocolFilter>()));
 
 	while (true)
 	{
-		Sleep(100);
+		string s;
+
+		cin >> s;
+
+		if (s.compare("q") == 0)
+		{
+			break;
+		}
 	}
+
+	server.Stop();
 
 	return 0;
 }

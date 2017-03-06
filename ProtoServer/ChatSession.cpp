@@ -1,24 +1,15 @@
 #include "stdafx.h"
 #include "ChatSession.h"
-#include "Network/SessionFactoryBase.h"
-
-ChatSession::ChatSession(int64_t handle, tcp::socket& socket, SessionFactoryBase* sessionManager) : SessionBase(handle, socket, sessionManager)
-{
-}
-
-
-ChatSession::~ChatSession()
-{
-}
+#include "Network/TCPServer.h"
 
 void ChatSession::OnConnect()
 {
-	cout << "connected : " << m_socket.remote_endpoint().address().to_string() << endl;
+	cout << "connected : " << socket_->remote_endpoint().address().to_string() << endl;
 }
 
 void ChatSession::OnDisconnect()
 {
-	cout << "disconnected : " << m_socket.remote_endpoint().address().to_string() << endl;
+	cout << "disconnected : " << socket_->remote_endpoint().address().to_string() << endl;
 }
 
 int ChatSession::OnRecv(asio::const_buffer& buf)
@@ -34,7 +25,7 @@ int ChatSession::OnRecv(asio::const_buffer& buf)
 
 			cout << "chat: " << s << endl;
 
-			m_sessionFactory->VisitSession([&s](auto session)
+			server_->VisitSession([&s](auto session)
 			{
 				session->Send(s.data(), static_cast<int>(s.length()));
 			});

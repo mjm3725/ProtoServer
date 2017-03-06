@@ -102,6 +102,7 @@
       <PreprocessorDefinitions>ASIO_STANDALONE;ASIO_HEADER_ONLY;ASIO_MSVC=_MSC_VER;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>./asio-1.10.8/include;./spdlog;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -135,8 +136,9 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ASIO_STANDALONE;ASIO_HEADER_ONLY;ASIO_MSVC=_MSC_VER;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>./asio-1.10.8/include;./spdlog;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -498,21 +500,22 @@
     <ClInclude Include="asio-1.10.8\include\asio\write.hpp" />
     <ClInclude Include="asio-1.10.8\include\asio\write_at.hpp" />
     <ClInclude Include="asio-1.10.8\include\asio\yield.hpp" />
+    <ClInclude Include="ChatServer.h" />
     <ClInclude Include="ChatSession.h" />
-    <ClInclude Include="ChatSessionFactory.h" />
+    <ClInclude Include="Network\IProtocolFilter.h" />
     <ClInclude Include="Network\SessionBase.h" />
-    <ClInclude Include="Network\SessionFactoryBase.h" />
     <ClInclude Include="Network\TCPServer.h" />
+    <ClInclude Include="Network\NullTerminateProtocolFilter.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Util\LogHelper.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ChatServer.cpp" />
     <ClCompile Include="ChatSession.cpp" />
-    <ClCompile Include="ChatSessionFactory.cpp" />
     <ClCompile Include="Network\SessionBase.cpp" />
-    <ClCompile Include="Network\SessionFactoryBase.cpp" />
     <ClCompile Include="Network\TCPServer.cpp" />
+    <ClCompile Include="Network\NullTerminateProtocolFilter.cpp" />
     <ClCompile Include="ProtoServer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

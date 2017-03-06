@@ -35,13 +35,7 @@
     <ClInclude Include="targetver.h">
       <Filter>소스 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Network\SessionFactoryBase.h">
-      <Filter>소스 파일\Network</Filter>
-    </ClInclude>
     <ClInclude Include="ChatSession.h">
-      <Filter>소스 파일\Test</Filter>
-    </ClInclude>
-    <ClInclude Include="ChatSessionFactory.h">
       <Filter>소스 파일\Test</Filter>
     </ClInclude>
     <ClInclude Include="Util\LogHelper.h">
@@ -396,6 +390,9 @@
     <ClInclude Include="asio-1.10.8\include\asio\write_at.hpp" />
     <ClInclude Include="asio-1.10.8\include\asio\yield.hpp" />
     <ClInclude Include="asio-1.10.8\include\asio.hpp" />
+    <ClInclude Include="Network\IProtocolFilter.h" />
+    <ClInclude Include="Network\NullTerminateProtocolFilter.h" />
+    <ClInclude Include="ChatServer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -410,17 +407,17 @@
     <ClCompile Include="Network\SessionBase.cpp">
       <Filter>소스 파일\Network</Filter>
     </ClCompile>
-    <ClCompile Include="Network\SessionFactoryBase.cpp">
-      <Filter>소스 파일\Network</Filter>
-    </ClCompile>
     <ClCompile Include="ChatSession.cpp">
-      <Filter>소스 파일\Test</Filter>
-    </ClCompile>
-    <ClCompile Include="ChatSessionFactory.cpp">
       <Filter>소스 파일\Test</Filter>
     </ClCompile>
     <ClCompile Include="Util\LogHelper.cpp">
       <Filter>소스 파일\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Network\NullTerminateProtocolFilter.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ChatServer.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
