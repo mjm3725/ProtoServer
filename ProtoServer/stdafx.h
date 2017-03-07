@@ -21,6 +21,7 @@
 #include <mutex>
 #include <functional>
 #include <thread>
+#include <algorithm>
 
 using namespace std;
 

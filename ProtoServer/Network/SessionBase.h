@@ -17,7 +17,7 @@ public:
 
 	virtual void OnConnect();
 	virtual void OnDisconnect();
-	virtual int OnRecv(asio::const_buffer& buf);
+	virtual void OnRecv(asio::const_buffer& buf, int packet_len);
 
 	void DoRecv();
 	void DoSend();

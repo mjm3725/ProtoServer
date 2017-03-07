@@ -8,6 +8,6 @@ class ChatSession :	public SessionBase
 public:
 	void OnConnect() override;
 	void OnDisconnect() override;
-	int OnRecv(asio::const_buffer& buf) override;
+	void OnRecv(asio::const_buffer& buf, int packet_len) override;
 };
 

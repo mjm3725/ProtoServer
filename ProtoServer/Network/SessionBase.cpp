@@ -26,9 +26,8 @@ int64_t SessionBase::GetHandle()
 	return handle_;
 }
 
-int SessionBase::OnRecv(asio::const_buffer& buf)
+void SessionBase::OnRecv(asio::const_buffer& buf, int packet_len)
 {
-	return 0;
 }
 
 void SessionBase::Send(const void* data, int size)
@@ -96,11 +95,13 @@ void SessionBase::DoRecv()
 		{
 			session->recv_buf_.commit(bytesTransferred);
 
-			size_t readSize = session->OnRecv(session->recv_buf_.data());
-			
-			if (readSize > 0)
+			int read_size = session->server_->GetProtocolFilter()->Parse(session->recv_buf_.data());
+
+			if (read_size > 0)
 			{
-				session->recv_buf_.consume(readSize);
+				session->OnRecv(session->recv_buf_.data(), read_size);
+
+				session->recv_buf_.consume(read_size);
 			}
 
 			session->DoRecv();

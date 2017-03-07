@@ -75,10 +75,29 @@ void TCPServer::DeleteSession(int64_t handle)
 
 void TCPServer::VisitSession(function<void(shared_ptr<SessionBase>&)> visitFunc)
 {
+	vector<shared_ptr<SessionBase>> sessions;
+
+	CopySession(sessions);
+	 
+	for (auto& v : sessions)
+	{
+		visitFunc(v);
+	}
+}
+
+void TCPServer::CopySession(vector<shared_ptr<SessionBase>>& sessions)
+{
 	lock_guard<mutex> lock(lock_);
 
-	for (auto& v : session_map_)
+	sessions.reserve(session_map_.size());
+
+	for(auto& v : session_map_)
 	{
-		visitFunc(v.second);
+		sessions.push_back(v.second);
 	}
+}
+
+IProtocolFilter* TCPServer::GetProtocolFilter()
+{
+	return protocol_filter_.get();
 }

@@ -18,9 +18,12 @@ public:
 
 	virtual shared_ptr<SessionBase> CreateSession() = 0;
 
+	IProtocolFilter* GetProtocolFilter();
+
 private:
 	void AddSession(shared_ptr<SessionBase>& session);
 	void DeleteSession(int64_t handle);
+	void CopySession(vector<shared_ptr<SessionBase>>& sessions);
 
 	void DoAccept();
 
