@@ -22,6 +22,7 @@ void ChatSession::OnRecv(asio::const_buffer& buf, int packet_len)
 
 	server_->VisitSession([&s](auto session)
 	{
+		session = nullptr;
 		session->Send(s.data(), static_cast<int>(s.length()));
 	});
 }
