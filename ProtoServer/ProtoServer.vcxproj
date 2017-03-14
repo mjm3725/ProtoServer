@@ -500,10 +500,8 @@
     <ClInclude Include="asio-1.10.8\include\asio\write.hpp" />
     <ClInclude Include="asio-1.10.8\include\asio\write_at.hpp" />
     <ClInclude Include="asio-1.10.8\include\asio\yield.hpp" />
-    <ClInclude Include="ChatServer.h" />
-    <ClInclude Include="ChatSession.h" />
     <ClInclude Include="Network\IProtocolFilter.h" />
-    <ClInclude Include="Network\SessionBase.h" />
+    <ClInclude Include="Network\Session.h" />
     <ClInclude Include="Network\TCPServer.h" />
     <ClInclude Include="Network\NullTerminateProtocolFilter.h" />
     <ClInclude Include="stdafx.h" />
@@ -511,9 +509,7 @@
     <ClInclude Include="Util\LogHelper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ChatServer.cpp" />
-    <ClCompile Include="ChatSession.cpp" />
-    <ClCompile Include="Network\SessionBase.cpp" />
+    <ClCompile Include="Network\Session.cpp" />
     <ClCompile Include="Network\TCPServer.cpp" />
     <ClCompile Include="Network\NullTerminateProtocolFilter.cpp" />
     <ClCompile Include="ProtoServer.cpp" />

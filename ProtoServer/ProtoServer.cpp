@@ -2,7 +2,8 @@
 //
 
 #include "stdafx.h"
-#include "ChatServer.h"
+#include "Network\TCPServer.h"
+#include "Network\Session.h"
 #include "Network\NullTerminateProtocolFilter.h"
 
 int main()
@@ -13,8 +14,31 @@ int main()
 	LogHelper::GetInstance()->GetConsoleLogger()->info("Port : {}", port);
 	LogHelper::GetInstance()->GetConsoleLogger()->info("IO Thread num : {}", 8);
 	
-	ChatServer server;
+	TCPServer server;
 	server.Start(8, port, static_pointer_cast<IProtocolFilter>(make_shared<NullTerminateProtocolFilter>()));
+	
+	server.OnConnected = [](shared_ptr<ISession>& session)
+	{
+		LogHelper::GetInstance()->GetConsoleLogger()->info("connected");
+	};
+
+	server.OnClosed = [](shared_ptr<ISession>& session)
+	{
+		LogHelper::GetInstance()->GetConsoleLogger()->info("closed");
+	};
+
+	server.OnRecv = [] (shared_ptr<ISession>& session, asio::const_buffer& buf, int packet_len){
+		const char* data = asio::buffer_cast<const char*>(buf);
+
+		string s(data, packet_len);
+
+		cout << "chat: " << s << endl;
+
+		session->GetServer()->VisitSession([&s](auto visit_session)
+		{
+			visit_session->Send(s.data(), static_cast<int>(s.length()));
+		});
+	};
 
 	while (true)
 	{

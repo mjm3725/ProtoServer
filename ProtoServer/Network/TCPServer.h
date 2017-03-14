@@ -5,8 +5,8 @@
 
 using asio::ip::tcp;
 
-class SessionBase;
-
+class ISession;
+class Session;
 
 class TCPServer
 {
@@ -14,16 +14,18 @@ public:
 	void Start(int thread_num, int port, shared_ptr<IProtocolFilter>& protocol_filter);
 	void Stop();
 
-	void VisitSession(function<void(shared_ptr<SessionBase>&)> visitFunc);
-
-	virtual shared_ptr<SessionBase> CreateSession() = 0;
+	void VisitSession(function<void(shared_ptr<ISession>&)> visitFunc);
 
 	IProtocolFilter* GetProtocolFilter();
 
+	function<void(shared_ptr<ISession>&)> OnConnected;
+	function<void(shared_ptr<ISession>&)> OnClosed;
+	function<void(shared_ptr<ISession>&, asio::const_buffer& buf, int packet_len)> OnRecv;
+
 private:
-	void AddSession(shared_ptr<SessionBase>& session);
+	void AddSession(shared_ptr<Session>& session);
 	void DeleteSession(int64_t handle);
-	void CopySession(vector<shared_ptr<SessionBase>>& sessions);
+	void CopySession(vector<shared_ptr<ISession>>& sessions);
 
 	void DoAccept();
 
@@ -34,8 +36,8 @@ private:
 
 	atomic<int64_t> current_handle_;
 
-	typedef unordered_map<int64_t, shared_ptr<SessionBase>>::value_type SessionMapValueType;
-	unordered_map<int64_t, shared_ptr<SessionBase>> session_map_;
+	typedef unordered_map<int64_t, shared_ptr<Session>>::value_type SessionMapValueType;
+	unordered_map<int64_t, shared_ptr<Session>> session_map_;
 
 	mutex lock_;
 };

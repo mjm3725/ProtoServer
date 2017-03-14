@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "TCPServer.h"
-#include "SessionBase.h"
+#include "Session.h"
 
 
 
@@ -38,17 +38,26 @@ void TCPServer::DoAccept()
 	{
 		if (!ec)
 		{
-			auto session = CreateSession();
+			auto new_session = make_shared<Session>();
 
-			session->Initialize(++current_handle_, socket_, this, [this](int64_t handle)
+			new_session->Initialize(++current_handle_, socket_, this);
+				
+			new_session->OnClosed = [this](shared_ptr<Session>& session)
 			{
-				DeleteSession(handle);
-			});
-			
-			AddSession(session);
+				DeleteSession(session->GetHandle());
+				OnClosed(static_pointer_cast<ISession>(session));
+			};
+				
+			new_session->OnRecv = [this](shared_ptr<Session>& session, asio::const_buffer& buf, int packet_len)
+			{
+				OnRecv(static_pointer_cast<ISession>(session), buf, packet_len);
+			};
 
-			session->OnConnect();
-			session->DoRecv();
+			AddSession(new_session);
+
+			OnConnected(static_pointer_cast<ISession>(new_session));
+
+			new_session->DoRecv();
 
 			DoAccept();
 		}
@@ -59,7 +68,7 @@ void TCPServer::DoAccept()
 	});
 }
 
-void TCPServer::AddSession(shared_ptr<SessionBase>& session)
+void TCPServer::AddSession(shared_ptr<Session>& session)
 {
 	lock_guard<mutex> lock(lock_);
 
@@ -73,9 +82,9 @@ void TCPServer::DeleteSession(int64_t handle)
 	session_map_.erase(handle);
 }
 
-void TCPServer::VisitSession(function<void(shared_ptr<SessionBase>&)> visitFunc)
+void TCPServer::VisitSession(function<void(shared_ptr<ISession>&)> visitFunc)
 {
-	vector<shared_ptr<SessionBase>> sessions;
+	vector<shared_ptr<ISession>> sessions;
 
 	CopySession(sessions);
 	 
@@ -85,15 +94,15 @@ void TCPServer::VisitSession(function<void(shared_ptr<SessionBase>&)> visitFunc)
 	}
 }
 
-void TCPServer::CopySession(vector<shared_ptr<SessionBase>>& sessions)
+void TCPServer::CopySession(vector<shared_ptr<ISession>>& sessions)
 {
-	lock_guard<mutex> lock(lock_);
-
+	lock_.lock();
 	sessions.reserve(session_map_.size());
-
+	lock_.unlock();
+		
 	for(auto& v : session_map_)
 	{
-		sessions.push_back(v.second);
+		sessions.push_back(static_pointer_cast<ISession>(v.second));
 	}
 }
 
