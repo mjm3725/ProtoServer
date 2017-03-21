@@ -43,7 +43,7 @@ public:
 
   /// Constructor.
   explicit verify_context(native_handle_type handle)
-    : handle_(handle)
+    : _handle(handle)
   {
   }
 
@@ -55,12 +55,12 @@ public:
    */
   native_handle_type native_handle()
   {
-    return handle_;
+    return _handle;
   }
 
 private:
   // The underlying native implementation.
-  native_handle_type handle_;
+  native_handle_type _handle;
 };
 
 #endif // defined(ASIO_ENABLE_OLD_SSL)

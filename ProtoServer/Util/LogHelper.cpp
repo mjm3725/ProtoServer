@@ -6,7 +6,7 @@ LogHelper LogHelper::s_instance;
 
 LogHelper::LogHelper()
 {
-	m_consoleLog = spdlog::stdout_color_mt("ProtoServer");
+	_consoleLog = spdlog::stdout_color_mt("ProtoServer");
 }
 
 
@@ -17,7 +17,7 @@ LogHelper* LogHelper::GetInstance()
 
 shared_ptr<spdlog::logger>& LogHelper::GetConsoleLogger()
 {
-	return m_consoleLog;
+	return _consoleLog;
 }
 
 

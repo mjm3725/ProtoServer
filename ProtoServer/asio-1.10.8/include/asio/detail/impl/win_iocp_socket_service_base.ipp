@@ -53,7 +53,7 @@ void win_iocp_socket_service_base::shutdown_service()
 void win_iocp_socket_service_base::construct(
     win_iocp_socket_service_base::base_implementation_type& impl)
 {
-  impl.socket_ = invalid_socket;
+  impl._socket = invalid_socket;
   impl.state_ = 0;
   impl.cancel_token_.reset();
 #if defined(ASIO_ENABLE_CANCELIO)
@@ -73,8 +73,8 @@ void win_iocp_socket_service_base::base_move_construct(
     win_iocp_socket_service_base::base_implementation_type& impl,
     win_iocp_socket_service_base::base_implementation_type& other_impl)
 {
-  impl.socket_ = other_impl.socket_;
-  other_impl.socket_ = invalid_socket;
+  impl._socket = other_impl._socket;
+  other_impl._socket = invalid_socket;
 
   impl.state_ = other_impl.state_;
   other_impl.state_ = 0;
@@ -117,8 +117,8 @@ void win_iocp_socket_service_base::base_move_assign(
     impl.prev_ = 0;
   }
 
-  impl.socket_ = other_impl.socket_;
-  other_impl.socket_ = invalid_socket;
+  impl._socket = other_impl._socket;
+  other_impl._socket = invalid_socket;
 
   impl.state_ = other_impl.state_;
   other_impl.state_ = 0;
@@ -175,12 +175,12 @@ asio::error_code win_iocp_socket_service_base::close(
           interlocked_compare_exchange_pointer(
             reinterpret_cast<void**>(&reactor_), 0, 0));
     if (r)
-      r->deregister_descriptor(impl.socket_, impl.reactor_data_, true);
+      r->deregister_descriptor(impl._socket, impl.reactor_data_, true);
   }
 
-  socket_ops::close(impl.socket_, impl.state_, false, ec);
+  socket_ops::close(impl._socket, impl.state_, false, ec);
 
-  impl.socket_ = invalid_socket;
+  impl._socket = invalid_socket;
   impl.state_ = 0;
   impl.cancel_token_.reset();
 #if defined(ASIO_ENABLE_CANCELIO)
@@ -208,7 +208,7 @@ asio::error_code win_iocp_socket_service_base::cancel(
     // The version of Windows supports cancellation from any thread.
     typedef BOOL (WINAPI* cancel_io_ex_t)(HANDLE, LPOVERLAPPED);
     cancel_io_ex_t cancel_io_ex = (cancel_io_ex_t)cancel_io_ex_ptr;
-    socket_type sock = impl.socket_;
+    socket_type sock = impl._socket;
     HANDLE sock_as_handle = reinterpret_cast<HANDLE>(sock);
     if (!cancel_io_ex(sock_as_handle, 0))
     {
@@ -275,7 +275,7 @@ asio::error_code win_iocp_socket_service_base::cancel(
           interlocked_compare_exchange_pointer(
             reinterpret_cast<void**>(&reactor_), 0, 0));
     if (r)
-      r->cancel_ops(impl.socket_, impl.reactor_data_);
+      r->cancel_ops(impl._socket, impl.reactor_data_);
   }
 
   return ec;
@@ -299,7 +299,7 @@ asio::error_code win_iocp_socket_service_base::do_open(
   if (iocp_service_.register_handle(sock_as_handle, ec))
     return ec;
 
-  impl.socket_ = sock.release();
+  impl._socket = sock.release();
   switch (type)
   {
   case SOCK_STREAM: impl.state_ = socket_ops::stream_oriented; break;
@@ -325,7 +325,7 @@ asio::error_code win_iocp_socket_service_base::do_assign(
   if (iocp_service_.register_handle(sock_as_handle, ec))
     return ec;
 
-  impl.socket_ = native_socket;
+  impl._socket = native_socket;
   switch (type)
   {
   case SOCK_STREAM: impl.state_ = socket_ops::stream_oriented; break;
@@ -352,7 +352,7 @@ void win_iocp_socket_service_base::start_send_op(
   else
   {
     DWORD bytes_transferred = 0;
-    int result = ::WSASend(impl.socket_, buffers,
+    int result = ::WSASend(impl._socket, buffers,
         static_cast<DWORD>(buffer_count), &bytes_transferred, flags, op, 0);
     DWORD last_error = ::WSAGetLastError();
     if (last_error == ERROR_PORT_UNREACHABLE)
@@ -378,7 +378,7 @@ void win_iocp_socket_service_base::start_send_to_op(
   else
   {
     DWORD bytes_transferred = 0;
-    int result = ::WSASendTo(impl.socket_, buffers,
+    int result = ::WSASendTo(impl._socket, buffers,
         static_cast<DWORD>(buffer_count),
         &bytes_transferred, flags, addr, addrlen, op, 0);
     DWORD last_error = ::WSAGetLastError();
@@ -407,7 +407,7 @@ void win_iocp_socket_service_base::start_receive_op(
   {
     DWORD bytes_transferred = 0;
     DWORD recv_flags = flags;
-    int result = ::WSARecv(impl.socket_, buffers,
+    int result = ::WSARecv(impl._socket, buffers,
         static_cast<DWORD>(buffer_count),
         &bytes_transferred, &recv_flags, op, 0);
     DWORD last_error = ::WSAGetLastError();
@@ -456,7 +456,7 @@ void win_iocp_socket_service_base::start_receive_from_op(
   {
     DWORD bytes_transferred = 0;
     DWORD recv_flags = flags;
-    int result = ::WSARecvFrom(impl.socket_, buffers,
+    int result = ::WSARecvFrom(impl._socket, buffers,
         static_cast<DWORD>(buffer_count),
         &bytes_transferred, &recv_flags, addr, addrlen, op, 0);
     DWORD last_error = ::WSAGetLastError();
@@ -490,7 +490,7 @@ void win_iocp_socket_service_base::start_accept_op(
     else
     {
       DWORD bytes_read = 0;
-      BOOL result = ::AcceptEx(impl.socket_, new_socket.get(), output_buffer,
+      BOOL result = ::AcceptEx(impl._socket, new_socket.get(), output_buffer,
           0, address_length, address_length, &bytes_read, op);
       DWORD last_error = ::WSAGetLastError();
       if (!result && last_error != WSA_IO_PENDING)
@@ -534,7 +534,7 @@ void win_iocp_socket_service_base::start_reactor_op(
 
   if (is_open(impl))
   {
-    r.start_op(op_type, impl.socket_, impl.reactor_data_, op, false, false);
+    r.start_op(op_type, impl._socket, impl.reactor_data_, op, false, false);
     return;
   }
   else
@@ -565,7 +565,7 @@ void win_iocp_socket_service_base::start_connect_op(
       memset(&a, 0, sizeof(a));
       a.base.sa_family = family;
 
-      socket_ops::bind(impl.socket_, &a.base,
+      socket_ops::bind(impl._socket, &a.base,
           family == ASIO_OS_DEF(AF_INET)
           ? sizeof(a.v4) : sizeof(a.v6), op->ec_);
       if (op->ec_ && op->ec_ != asio::error::invalid_argument)
@@ -578,7 +578,7 @@ void win_iocp_socket_service_base::start_connect_op(
       update_cancellation_thread_id(impl);
       iocp_service_.work_started();
 
-      BOOL result = connect_ex(impl.socket_,
+      BOOL result = connect_ex(impl._socket,
           addr, static_cast<int>(addrlen), 0, 0, 0, op);
       DWORD last_error = ::WSAGetLastError();
       if (!result && last_error != WSA_IO_PENDING)
@@ -595,15 +595,15 @@ void win_iocp_socket_service_base::start_connect_op(
 
   if ((impl.state_ & socket_ops::non_blocking) != 0
       || socket_ops::set_internal_non_blocking(
-        impl.socket_, impl.state_, true, op->ec_))
+        impl._socket, impl.state_, true, op->ec_))
   {
-    if (socket_ops::connect(impl.socket_, addr, addrlen, op->ec_) != 0)
+    if (socket_ops::connect(impl._socket, addr, addrlen, op->ec_) != 0)
     {
       if (op->ec_ == asio::error::in_progress
           || op->ec_ == asio::error::would_block)
       {
         op->ec_ = asio::error_code();
-        r.start_op(reactor::connect_op, impl.socket_,
+        r.start_op(reactor::connect_op, impl._socket,
             impl.reactor_data_, op, false, false);
         return;
       }
@@ -627,12 +627,12 @@ void win_iocp_socket_service_base::close_for_destruction(
           interlocked_compare_exchange_pointer(
             reinterpret_cast<void**>(&reactor_), 0, 0));
     if (r)
-      r->deregister_descriptor(impl.socket_, impl.reactor_data_, true);
+      r->deregister_descriptor(impl._socket, impl.reactor_data_, true);
   }
 
   asio::error_code ignored_ec;
-  socket_ops::close(impl.socket_, impl.state_, true, ignored_ec);
-  impl.socket_ = invalid_socket;
+  socket_ops::close(impl._socket, impl.state_, true, ignored_ec);
+  impl._socket = invalid_socket;
   impl.state_ = 0;
   impl.cancel_token_.reset();
 #if defined(ASIO_ENABLE_CANCELIO)
@@ -686,7 +686,7 @@ win_iocp_socket_service_base::get_connect_ex(
       { 0x8e, 0xe9, 0x76, 0xe5, 0x8c, 0x74, 0x06, 0x3e } };
 
     DWORD bytes = 0;
-    if (::WSAIoctl(impl.socket_, SIO_GET_EXTENSION_FUNCTION_POINTER,
+    if (::WSAIoctl(impl._socket, SIO_GET_EXTENSION_FUNCTION_POINTER,
           &guid, sizeof(guid), &ptr, sizeof(ptr), &bytes, 0, 0) != 0)
     {
       // Set connect_ex_ to a special value to indicate that ConnectEx is

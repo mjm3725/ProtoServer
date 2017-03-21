@@ -37,7 +37,7 @@ public:
       socket_ops::state_type state, Socket& peer, const Protocol& protocol,
       typename Protocol::endpoint* peer_endpoint, func_type complete_func)
     : reactor_op(&reactive_socket_accept_op_base::do_perform, complete_func),
-      socket_(socket),
+      _socket(socket),
       state_(state),
       peer_(peer),
       protocol_(protocol),
@@ -52,7 +52,7 @@ public:
 
     std::size_t addrlen = o->peer_endpoint_ ? o->peer_endpoint_->capacity() : 0;
     socket_type new_socket = invalid_socket;
-    bool result = socket_ops::non_blocking_accept(o->socket_,
+    bool result = socket_ops::non_blocking_accept(o->_socket,
           o->state_, o->peer_endpoint_ ? o->peer_endpoint_->data() : 0,
           o->peer_endpoint_ ? &addrlen : 0, o->ec_, new_socket);
 
@@ -70,7 +70,7 @@ public:
   }
 
 private:
-  socket_type socket_;
+  socket_type _socket;
   socket_ops::state_type state_;
   Socket& peer_;
   Protocol protocol_;

@@ -36,7 +36,7 @@ public:
       socket_ops::state_type state, const MutableBufferSequence& buffers,
       socket_base::message_flags flags, func_type complete_func)
     : reactor_op(&reactive_socket_recv_op_base::do_perform, complete_func),
-      socket_(socket),
+      _socket(socket),
       state_(state),
       buffers_(buffers),
       flags_(flags)
@@ -51,14 +51,14 @@ public:
     buffer_sequence_adapter<asio::mutable_buffer,
         MutableBufferSequence> bufs(o->buffers_);
 
-    return socket_ops::non_blocking_recv(o->socket_,
+    return socket_ops::non_blocking_recv(o->_socket,
         bufs.buffers(), bufs.count(), o->flags_,
         (o->state_ & socket_ops::stream_oriented) != 0,
         o->ec_, o->bytes_transferred_);
   }
 
 private:
-  socket_type socket_;
+  socket_type _socket;
   socket_ops::state_type state_;
   MutableBufferSequence buffers_;
   socket_base::message_flags flags_;

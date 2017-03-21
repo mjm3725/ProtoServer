@@ -22,12 +22,13 @@ int main()
 		LogHelper::GetInstance()->GetConsoleLogger()->info("connected");
 	};
 
-	server.OnClosed = [](shared_ptr<ISession>& session)
+	server.OnClosed = [](shared_ptr<ISession>& session, error_code& errorCode)
 	{
 		LogHelper::GetInstance()->GetConsoleLogger()->info("closed");
 	};
 
-	server.OnRecv = [] (shared_ptr<ISession>& session, asio::const_buffer& buf, int packet_len){
+	server.OnRecv = [] (shared_ptr<ISession>& session, asio::const_buffer& buf, int packet_len)
+	{
 		const char* data = asio::buffer_cast<const char*>(buf);
 
 		string s(data, packet_len);

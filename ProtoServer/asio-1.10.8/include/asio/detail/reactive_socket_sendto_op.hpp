@@ -36,7 +36,7 @@ public:
       const ConstBufferSequence& buffers, const Endpoint& endpoint,
       socket_base::message_flags flags, func_type complete_func)
     : reactor_op(&reactive_socket_sendto_op_base::do_perform, complete_func),
-      socket_(socket),
+      _socket(socket),
       buffers_(buffers),
       destination_(endpoint),
       flags_(flags)
@@ -51,14 +51,14 @@ public:
     buffer_sequence_adapter<asio::const_buffer,
         ConstBufferSequence> bufs(o->buffers_);
 
-    return socket_ops::non_blocking_sendto(o->socket_,
+    return socket_ops::non_blocking_sendto(o->_socket,
           bufs.buffers(), bufs.count(), o->flags_,
           o->destination_.data(), o->destination_.size(),
           o->ec_, o->bytes_transferred_);
   }
 
 private:
-  socket_type socket_;
+  socket_type _socket;
   ConstBufferSequence buffers_;
   Endpoint destination_;
   socket_base::message_flags flags_;

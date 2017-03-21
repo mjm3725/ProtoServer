@@ -766,7 +766,7 @@ private:
   ASIO_DECL BIO* make_buffer_bio(const const_buffer& b);
 
   // The underlying native implementation.
-  native_handle_type handle_;
+  native_handle_type _handle;
 
   // Ensure openssl is initialised.
   asio::ssl::detail::openssl_init<> init_;

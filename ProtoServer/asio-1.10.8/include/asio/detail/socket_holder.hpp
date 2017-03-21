@@ -31,42 +31,42 @@ class socket_holder
 public:
   // Construct as an uninitialised socket.
   socket_holder()
-    : socket_(invalid_socket)
+    : _socket(invalid_socket)
   {
   }
 
   // Construct to take ownership of the specified socket.
   explicit socket_holder(socket_type s)
-    : socket_(s)
+    : _socket(s)
   {
   }
 
   // Destructor.
   ~socket_holder()
   {
-    if (socket_ != invalid_socket)
+    if (_socket != invalid_socket)
     {
       asio::error_code ec;
       socket_ops::state_type state = 0;
-      socket_ops::close(socket_, state, true, ec);
+      socket_ops::close(_socket, state, true, ec);
     }
   }
 
   // Get the underlying socket.
   socket_type get() const
   {
-    return socket_;
+    return _socket;
   }
 
   // Reset to an uninitialised socket.
   void reset()
   {
-    if (socket_ != invalid_socket)
+    if (_socket != invalid_socket)
     {
       asio::error_code ec;
       socket_ops::state_type state = 0;
-      socket_ops::close(socket_, state, true, ec);
-      socket_ = invalid_socket;
+      socket_ops::close(_socket, state, true, ec);
+      _socket = invalid_socket;
     }
   }
 
@@ -74,20 +74,20 @@ public:
   void reset(socket_type s)
   {
     reset();
-    socket_ = s;
+    _socket = s;
   }
 
   // Release ownership of the socket.
   socket_type release()
   {
-    socket_type tmp = socket_;
-    socket_ = invalid_socket;
+    socket_type tmp = _socket;
+    _socket = invalid_socket;
     return tmp;
   }
 
 private:
   // The underlying socket.
-  socket_type socket_;
+  socket_type _socket;
 };
 
 } // namespace detail

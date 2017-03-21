@@ -4,27 +4,29 @@
 
 
 
-void TCPServer::Start(int thread_num, int port, shared_ptr<IProtocolFilter>& protocol_filter)
+void TCPServer::Start(int threadNum, int port, shared_ptr<IProtocolFilter>& protocolFilter)
 {
-	protocol_filter_ = protocol_filter;
-	acceptor_ = make_shared<tcp::acceptor>(io_service_, tcp::endpoint(tcp::v4(), port));
+	_protocolFilter = protocolFilter;
+	_acceptor = make_shared<tcp::acceptor>(_ioService, tcp::endpoint(tcp::v4(), port));
 
 	DoAccept();
 
-	for (int i = 0; i < thread_num; i++)
+	_threads.reserve(threadNum);
+
+	for (int i = 0; i < threadNum; i++)
 	{
-		threads_.push_back(make_shared<thread>([this]
+		_threads.push_back(make_shared<thread>([this]
 		{
-			io_service_.run();
+			_ioService.run();
 		}));
 	}
 }
 
 void TCPServer::Stop()
 {
-	io_service_.stop();
+	_ioService.stop();
 
-	for (auto thread : threads_)
+	for (auto& thread : _threads)
 	{
 		thread->join();
 	}
@@ -32,25 +34,25 @@ void TCPServer::Stop()
 
 void TCPServer::DoAccept()
 {
-	auto socket_ = make_shared<tcp::socket>(io_service_);
+	auto _socket = make_shared<tcp::socket>(_ioService);
 
-	acceptor_->async_accept(*socket_, [this, socket_](error_code ec) mutable
+	_acceptor->async_accept(*_socket, [this, _socket](error_code ec) mutable
 	{
 		if (!ec)
 		{
 			auto new_session = make_shared<Session>();
 
-			new_session->Initialize(++current_handle_, socket_, this);
+			new_session->Initialize(++_currentHandle, _socket, this);
 				
-			new_session->OnClosed = [this](shared_ptr<Session>& session)
+			new_session->OnClosed = [this](shared_ptr<Session>& session, error_code& errorCode)
 			{
 				DeleteSession(session->GetHandle());
-				OnClosed(static_pointer_cast<ISession>(session));
+				OnClosed(static_pointer_cast<ISession>(session), errorCode);
 			};
 				
-			new_session->OnRecv = [this](shared_ptr<Session>& session, asio::const_buffer& buf, int packet_len)
+			new_session->OnRecv = [this](shared_ptr<Session>& session, asio::const_buffer& buf, int packetLen)
 			{
-				OnRecv(static_pointer_cast<ISession>(session), buf, packet_len);
+				OnRecv(static_pointer_cast<ISession>(session), buf, packetLen);
 			};
 
 			AddSession(new_session);
@@ -70,16 +72,16 @@ void TCPServer::DoAccept()
 
 void TCPServer::AddSession(shared_ptr<Session>& session)
 {
-	lock_guard<mutex> lock(lock_);
+	lock_guard<mutex> lock(_lock);
 
-	session_map_.insert(SessionMapValueType(session->GetHandle(), session));
+	_sessionMap.insert(SessionMapValueType(session->GetHandle(), session));
 }
 
 void TCPServer::DeleteSession(int64_t handle)
 {
-	lock_guard<mutex> lock(lock_);
+	lock_guard<mutex> lock(_lock);
 
-	session_map_.erase(handle);
+	_sessionMap.erase(handle);
 }
 
 void TCPServer::VisitSession(function<void(shared_ptr<ISession>&)> visitFunc)
@@ -96,11 +98,11 @@ void TCPServer::VisitSession(function<void(shared_ptr<ISession>&)> visitFunc)
 
 void TCPServer::CopySession(vector<shared_ptr<ISession>>& sessions)
 {
-	lock_.lock();
-	sessions.reserve(session_map_.size());
-	lock_.unlock();
+	_lock.lock();
+	sessions.reserve(_sessionMap.size());
+	_lock.unlock();
 		
-	for(auto& v : session_map_)
+	for(auto& v : _sessionMap)
 	{
 		sessions.push_back(static_pointer_cast<ISession>(v.second));
 	}
@@ -108,5 +110,5 @@ void TCPServer::CopySession(vector<shared_ptr<ISession>>& sessions)
 
 IProtocolFilter* TCPServer::GetProtocolFilter()
 {
-	return protocol_filter_.get();
+	return _protocolFilter.get();
 }

@@ -15,5 +15,5 @@ private:
 
 	LogHelper();
 
-	shared_ptr<spdlog::logger> m_consoleLog;
+	shared_ptr<spdlog::logger> _consoleLog;
 };

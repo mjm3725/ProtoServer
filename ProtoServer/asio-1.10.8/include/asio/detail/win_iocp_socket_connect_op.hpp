@@ -38,7 +38,7 @@ class win_iocp_socket_connect_op_base : public reactor_op
 public:
   win_iocp_socket_connect_op_base(socket_type socket, func_type complete_func)
     : reactor_op(&win_iocp_socket_connect_op_base::do_perform, complete_func),
-      socket_(socket),
+      _socket(socket),
       connect_ex_(false)
   {
   }
@@ -48,10 +48,10 @@ public:
     win_iocp_socket_connect_op_base* o(
         static_cast<win_iocp_socket_connect_op_base*>(base));
 
-    return socket_ops::non_blocking_connect(o->socket_, o->ec_);
+    return socket_ops::non_blocking_connect(o->_socket, o->ec_);
   }
 
-  socket_type socket_;
+  socket_type _socket;
   bool connect_ex_;
 };
 
@@ -82,7 +82,7 @@ public:
     if (owner)
     {
       if (o->connect_ex_)
-        socket_ops::complete_iocp_connect(o->socket_, ec);
+        socket_ops::complete_iocp_connect(o->_socket, ec);
       else
         ec = o->ec_;
     }

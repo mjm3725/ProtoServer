@@ -22,6 +22,8 @@
 #include <functional>
 #include <thread>
 #include <algorithm>
+#include <tuple>
+#include <list>
 
 using namespace std;
 

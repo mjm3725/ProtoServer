@@ -183,7 +183,7 @@ namespace detail
         const ConnectCondition& connect_condition,
         ComposedConnectHandler& handler)
       : base_from_connect_condition<ConnectCondition>(connect_condition),
-        socket_(sock),
+        _socket(sock),
         iter_(begin),
         end_(end),
         start_(0),
@@ -194,7 +194,7 @@ namespace detail
 #if defined(ASIO_HAS_MOVE)
     connect_op(const connect_op& other)
       : base_from_connect_condition<ConnectCondition>(other),
-        socket_(other.socket_),
+        _socket(other._socket),
         iter_(other.iter_),
         end_(other.end_),
         start_(other.start_),
@@ -204,7 +204,7 @@ namespace detail
 
     connect_op(connect_op&& other)
       : base_from_connect_condition<ConnectCondition>(other),
-        socket_(other.socket_),
+        _socket(other._socket),
         iter_(other.iter_),
         end_(other.end_),
         start_(other.start_),
@@ -224,8 +224,8 @@ namespace detail
 
           if (iter_ != end_)
           {
-            socket_.close(ec);
-            socket_.async_connect(*iter_,
+            _socket.close(ec);
+            _socket.async_connect(*iter_,
                 ASIO_MOVE_CAST(connect_op)(*this));
             return;
           }
@@ -233,7 +233,7 @@ namespace detail
           if (start)
           {
             ec = asio::error::not_found;
-            socket_.get_io_service().post(detail::bind_handler(*this, ec));
+            _socket.get_io_service().post(detail::bind_handler(*this, ec));
             return;
           }
 
@@ -242,7 +242,7 @@ namespace detail
           if (iter_ == end_)
             break;
 
-          if (!socket_.is_open())
+          if (!_socket.is_open())
           {
             ec = asio::error::operation_aborted;
             break;
@@ -260,7 +260,7 @@ namespace detail
     }
 
   //private:
-    basic_socket<Protocol, SocketService>& socket_;
+    basic_socket<Protocol, SocketService>& _socket;
     Iterator iter_;
     Iterator end_;
     int start_;

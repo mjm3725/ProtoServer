@@ -49,7 +49,7 @@ public:
   public:
     // Default constructor.
     implementation_type()
-      : handle_(INVALID_HANDLE_VALUE),
+      : _handle(INVALID_HANDLE_VALUE),
         safe_cancellation_thread_id_(0),
         next_(0),
         prev_(0)
@@ -61,7 +61,7 @@ public:
     friend class win_iocp_handle_service;
 
     // The native stream handle representation.
-    native_handle_type handle_;
+    native_handle_type _handle;
 
     // The ID of the thread from which it is safe to cancel asynchronous
     // operations. 0 means no asynchronous operations have been started yet.
@@ -101,7 +101,7 @@ public:
   // Determine whether the handle is open.
   bool is_open(const implementation_type& impl) const
   {
-    return impl.handle_ != INVALID_HANDLE_VALUE;
+    return impl._handle != INVALID_HANDLE_VALUE;
   }
 
   // Destroy a handle implementation.
@@ -111,7 +111,7 @@ public:
   // Get the native handle representation.
   native_handle_type native_handle(const implementation_type& impl) const
   {
-    return impl.handle_;
+    return impl._handle;
   }
 
   // Cancel all operations associated with the handle.

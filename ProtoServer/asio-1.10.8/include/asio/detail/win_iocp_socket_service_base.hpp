@@ -54,7 +54,7 @@ public:
   struct base_implementation_type
   {
     // The native socket representation.
-    socket_type socket_;
+    socket_type _socket;
 
     // The current state of the socket.
     socket_ops::state_type state_;
@@ -108,7 +108,7 @@ public:
   // Determine whether the socket is open.
   bool is_open(const base_implementation_type& impl) const
   {
-    return impl.socket_ != invalid_socket;
+    return impl._socket != invalid_socket;
   }
 
   // Destroy a socket implementation.
@@ -123,21 +123,21 @@ public:
   bool at_mark(const base_implementation_type& impl,
       asio::error_code& ec) const
   {
-    return socket_ops::sockatmark(impl.socket_, ec);
+    return socket_ops::sockatmark(impl._socket, ec);
   }
 
   // Determine the number of bytes available for reading.
   std::size_t available(const base_implementation_type& impl,
       asio::error_code& ec) const
   {
-    return socket_ops::available(impl.socket_, ec);
+    return socket_ops::available(impl._socket, ec);
   }
 
   // Place the socket into the state where it will listen for new connections.
   asio::error_code listen(base_implementation_type& impl,
       int backlog, asio::error_code& ec)
   {
-    socket_ops::listen(impl.socket_, backlog, ec);
+    socket_ops::listen(impl._socket, backlog, ec);
     return ec;
   }
 
@@ -146,7 +146,7 @@ public:
   asio::error_code io_control(base_implementation_type& impl,
       IO_Control_Command& command, asio::error_code& ec)
   {
-    socket_ops::ioctl(impl.socket_, impl.state_, command.name(),
+    socket_ops::ioctl(impl._socket, impl.state_, command.name(),
         static_cast<ioctl_arg_type*>(command.data()), ec);
     return ec;
   }
@@ -161,7 +161,7 @@ public:
   asio::error_code non_blocking(base_implementation_type& impl,
       bool mode, asio::error_code& ec)
   {
-    socket_ops::set_user_non_blocking(impl.socket_, impl.state_, mode, ec);
+    socket_ops::set_user_non_blocking(impl._socket, impl.state_, mode, ec);
     return ec;
   }
 
@@ -175,7 +175,7 @@ public:
   asio::error_code native_non_blocking(base_implementation_type& impl,
       bool mode, asio::error_code& ec)
   {
-    socket_ops::set_internal_non_blocking(impl.socket_, impl.state_, mode, ec);
+    socket_ops::set_internal_non_blocking(impl._socket, impl.state_, mode, ec);
     return ec;
   }
 
@@ -183,7 +183,7 @@ public:
   asio::error_code shutdown(base_implementation_type& impl,
       socket_base::shutdown_type what, asio::error_code& ec)
   {
-    socket_ops::shutdown(impl.socket_, what, ec);
+    socket_ops::shutdown(impl._socket, what, ec);
     return ec;
   }
 
@@ -196,7 +196,7 @@ public:
     buffer_sequence_adapter<asio::const_buffer,
         ConstBufferSequence> bufs(buffers);
 
-    return socket_ops::sync_send(impl.socket_, impl.state_,
+    return socket_ops::sync_send(impl._socket, impl.state_,
         bufs.buffers(), bufs.count(), flags, bufs.all_empty(), ec);
   }
 
@@ -205,7 +205,7 @@ public:
       socket_base::message_flags, asio::error_code& ec)
   {
     // Wait for socket to become ready.
-    socket_ops::poll_write(impl.socket_, impl.state_, ec);
+    socket_ops::poll_write(impl._socket, impl.state_, ec);
 
     return 0;
   }
@@ -263,7 +263,7 @@ public:
     buffer_sequence_adapter<asio::mutable_buffer,
         MutableBufferSequence> bufs(buffers);
 
-    return socket_ops::sync_recv(impl.socket_, impl.state_,
+    return socket_ops::sync_recv(impl._socket, impl.state_,
         bufs.buffers(), bufs.count(), flags, bufs.all_empty(), ec);
   }
 
@@ -272,7 +272,7 @@ public:
       socket_base::message_flags, asio::error_code& ec)
   {
     // Wait for socket to become ready.
-    socket_ops::poll_read(impl.socket_, impl.state_, ec);
+    socket_ops::poll_read(impl._socket, impl.state_, ec);
 
     return 0;
   }
@@ -332,7 +332,7 @@ public:
     buffer_sequence_adapter<asio::mutable_buffer,
         MutableBufferSequence> bufs(buffers);
 
-    return socket_ops::sync_recvmsg(impl.socket_, impl.state_,
+    return socket_ops::sync_recvmsg(impl._socket, impl.state_,
         bufs.buffers(), bufs.count(), in_flags, out_flags, ec);
   }
 
@@ -342,7 +342,7 @@ public:
       socket_base::message_flags& out_flags, asio::error_code& ec)
   {
     // Wait for socket to become ready.
-    socket_ops::poll_read(impl.socket_, impl.state_, ec);
+    socket_ops::poll_read(impl._socket, impl.state_, ec);
 
     // Clear out_flags, since we cannot give it any other sensible value when
     // performing a null_buffers operation.

@@ -3,37 +3,34 @@
 #include "TCPServer.h"
 
 
-void Session::Initialize(
-	int64_t handle,
-	shared_ptr<tcp::socket>& socket,
-	TCPServer* server)
+void Session::Initialize(int64_t handle, shared_ptr<tcp::socket>& socket, TCPServer* server)
 {
-	handle_ = handle;
-	socket_ = socket;
-	server_ = server;
+	_handle = handle;
+	_socket = socket;
+	_server = server;
 }
 
 TCPServer* Session::GetServer()
 {
-	return server_;
+	return _server;
 }
 
 int64_t Session::GetHandle()
 {
-	return handle_;
+	return _handle;
 }
 
 
 void Session::Send(const void* data, int size)
 {
-	lock_guard<mutex> lock(send_buf_lock_);
+	lock_guard<mutex> lock(_sendBufLock);
 
-	size_t sendBufSize = send_buf_.size();
+	size_t sendBufSize = _sendBuf.size();
 
 	if (sendBufSize + size > SEND_BUF_SIZE)
 	{
 		cout << "send buffer full" << endl;
-		socket_->close();
+		_socket->close();
 		return;
 	}
 
@@ -44,11 +41,11 @@ void Session::Send(const void* data, int size)
 		isSend = true;
 	}
 	
-	auto buf = send_buf_.prepare(SEND_BUF_SIZE - sendBufSize);
+	auto buf = _sendBuf.prepare(SEND_BUF_SIZE - sendBufSize);
 
 	asio::buffer_copy(buf, asio::buffer(data, size));
 
-	send_buf_.commit(size);
+	_sendBuf.commit(size);
 
 	if (isSend)
 	{
@@ -58,22 +55,22 @@ void Session::Send(const void* data, int size)
 
 void Session::DoSend()
 {
-	socket_->async_send(send_buf_.data(), [session = shared_from_this()](error_code ec, size_t bytesTransferred)
+	_socket->async_send(_sendBuf.data(), [session = shared_from_this()](error_code ec, size_t bytesTransferred)
 	{
 		if (!ec)
 		{
-			lock_guard<mutex> lock(session->send_buf_lock_);
+			lock_guard<mutex> lock(session->_sendBufLock);
 
-			session->send_buf_.consume(bytesTransferred);
+			session->_sendBuf.consume(bytesTransferred);
 
-			if (session->send_buf_.size() > 0)
+			if (session->_sendBuf.size() > 0)
 			{
 				session->DoSend();
 			}
 		}
 		else
 		{
-			session->socket_->close();
+			session->_socket->close();
 		}
 	});
 }
@@ -81,29 +78,29 @@ void Session::DoSend()
 void Session::DoRecv()
 {
 	// resize안되게 남은 input buffer크기만큼만 prepare함
-	auto buf = recv_buf_.prepare(RECV_BUF_SIZE - recv_buf_.size());
+	auto buf = _recvBuf.prepare(RECV_BUF_SIZE - _recvBuf.size());
 
-	socket_->async_receive(buf, [session = shared_from_this()](error_code ec, size_t bytesTransferred) mutable
+	_socket->async_receive(buf, [session = shared_from_this()](error_code ec, size_t bytesTransferred) mutable
 	{
 		if (!ec)
 		{
-			session->recv_buf_.commit(bytesTransferred);
+			session->_recvBuf.commit(bytesTransferred);
 
-			int read_size = session->server_->GetProtocolFilter()->Parse(session->recv_buf_.data());
+			int read_size = session->_server->GetProtocolFilter()->Parse(session->_recvBuf.data());
 
 			if (read_size > 0)
 			{
-				session->OnRecv(session, session->recv_buf_.data(), read_size);
+				session->OnRecv(session, session->_recvBuf.data(), read_size);
 
-				session->recv_buf_.consume(read_size);
+				session->_recvBuf.consume(read_size);
 			}
 
 			session->DoRecv();
 		}
 		else
 		{
-			session->OnClosed(session);
-			session->socket_->close();
+			session->OnClosed(session, ec);
+			session->_socket->close();
 		}
 	});
 }

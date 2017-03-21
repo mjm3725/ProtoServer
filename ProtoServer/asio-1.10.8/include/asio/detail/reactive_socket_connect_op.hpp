@@ -33,7 +33,7 @@ class reactive_socket_connect_op_base : public reactor_op
 public:
   reactive_socket_connect_op_base(socket_type socket, func_type complete_func)
     : reactor_op(&reactive_socket_connect_op_base::do_perform, complete_func),
-      socket_(socket)
+      _socket(socket)
   {
   }
 
@@ -42,11 +42,11 @@ public:
     reactive_socket_connect_op_base* o(
         static_cast<reactive_socket_connect_op_base*>(base));
 
-    return socket_ops::non_blocking_connect(o->socket_, o->ec_);
+    return socket_ops::non_blocking_connect(o->_socket, o->ec_);
   }
 
 private:
-  socket_type socket_;
+  socket_type _socket;
 };
 
 template <typename Handler>

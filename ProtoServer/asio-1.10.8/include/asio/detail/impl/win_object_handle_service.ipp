@@ -57,7 +57,7 @@ void win_object_handle_service::shutdown_service()
 void win_object_handle_service::construct(
     win_object_handle_service::implementation_type& impl)
 {
-  impl.handle_ = INVALID_HANDLE_VALUE;
+  impl._handle = INVALID_HANDLE_VALUE;
   impl.wait_handle_ = INVALID_HANDLE_VALUE;
   impl.owner_ = this;
 
@@ -89,8 +89,8 @@ void win_object_handle_service::move_construct(
     impl_list_ = &impl;
   }
 
-  impl.handle_ = other_impl.handle_;
-  other_impl.handle_ = INVALID_HANDLE_VALUE;
+  impl._handle = other_impl._handle;
+  other_impl._handle = INVALID_HANDLE_VALUE;
   impl.wait_handle_ = other_impl.wait_handle_;
   other_impl.wait_handle_ = INVALID_HANDLE_VALUE;
   impl.op_queue_.push(other_impl.op_queue_);
@@ -131,8 +131,8 @@ void win_object_handle_service::move_assign(
     impl.prev_ = 0;
   }
 
-  impl.handle_ = other_impl.handle_;
-  other_impl.handle_ = INVALID_HANDLE_VALUE;
+  impl._handle = other_impl._handle;
+  other_impl._handle = INVALID_HANDLE_VALUE;
   impl.wait_handle_ = other_impl.wait_handle_;
   other_impl.wait_handle_ = INVALID_HANDLE_VALUE;
   impl.op_queue_.push(other_impl.op_queue_);
@@ -198,8 +198,8 @@ void win_object_handle_service::destroy(
     if (wait_handle != INVALID_HANDLE_VALUE)
       ::UnregisterWaitEx(wait_handle, INVALID_HANDLE_VALUE);
 
-    ::CloseHandle(impl.handle_);
-    impl.handle_ = INVALID_HANDLE_VALUE;
+    ::CloseHandle(impl._handle);
+    impl._handle = INVALID_HANDLE_VALUE;
 
     io_service_.post_deferred_completions(ops);
   }
@@ -215,7 +215,7 @@ asio::error_code win_object_handle_service::assign(
     return ec;
   }
 
-  impl.handle_ = handle;
+  impl._handle = handle;
   ec = asio::error_code();
   return ec;
 }
@@ -249,9 +249,9 @@ asio::error_code win_object_handle_service::close(
     if (wait_handle != INVALID_HANDLE_VALUE)
       ::UnregisterWaitEx(wait_handle, INVALID_HANDLE_VALUE);
 
-    if (::CloseHandle(impl.handle_))
+    if (::CloseHandle(impl._handle))
     {
-      impl.handle_ = INVALID_HANDLE_VALUE;
+      impl._handle = INVALID_HANDLE_VALUE;
       ec = asio::error_code();
     }
     else
@@ -316,7 +316,7 @@ void win_object_handle_service::wait(
     win_object_handle_service::implementation_type& impl,
     asio::error_code& ec)
 {
-  switch (::WaitForSingleObject(impl.handle_, INFINITE))
+  switch (::WaitForSingleObject(impl._handle, INFINITE))
   {
   case WAIT_FAILED:
     {
@@ -371,7 +371,7 @@ void win_object_handle_service::register_wait_callback(
   lock.lock();
 
   if (!RegisterWaitForSingleObject(&impl.wait_handle_,
-        impl.handle_, &win_object_handle_service::wait_callback,
+        impl._handle, &win_object_handle_service::wait_callback,
         &impl, INFINITE, WT_EXECUTEONLYONCE))
   {
     DWORD last_error = ::GetLastError();
@@ -413,7 +413,7 @@ void win_object_handle_service::wait_callback(PVOID param, BOOLEAN)
     if (!impl->op_queue_.empty())
     {
       if (!RegisterWaitForSingleObject(&impl->wait_handle_,
-            impl->handle_, &win_object_handle_service::wait_callback,
+            impl->_handle, &win_object_handle_service::wait_callback,
             param, INFINITE, WT_EXECUTEONLYONCE))
       {
         DWORD last_error = ::GetLastError();

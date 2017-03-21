@@ -43,7 +43,7 @@ public:
    public:
     // Default constructor.
     implementation_type()
-      : handle_(INVALID_HANDLE_VALUE),
+      : _handle(INVALID_HANDLE_VALUE),
         wait_handle_(INVALID_HANDLE_VALUE),
         owner_(0),
         next_(0),
@@ -57,7 +57,7 @@ public:
 
     // The native object handle representation. May be accessed or modified
     // without locking the mutex.
-    native_handle_type handle_;
+    native_handle_type _handle;
 
     // The handle used to unregister the wait operation. The mutex must be
     // locked when accessing or modifying this member.
@@ -106,7 +106,7 @@ public:
   // Determine whether the handle is open.
   bool is_open(const implementation_type& impl) const
   {
-    return impl.handle_ != INVALID_HANDLE_VALUE && impl.handle_ != 0;
+    return impl._handle != INVALID_HANDLE_VALUE && impl._handle != 0;
   }
 
   // Destroy a handle implementation.
@@ -116,7 +116,7 @@ public:
   // Get the native handle representation.
   native_handle_type native_handle(const implementation_type& impl) const
   {
-    return impl.handle_;
+    return impl._handle;
   }
 
   // Cancel all operations associated with the handle.

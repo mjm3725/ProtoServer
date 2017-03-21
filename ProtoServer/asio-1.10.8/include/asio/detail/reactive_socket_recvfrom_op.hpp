@@ -36,7 +36,7 @@ public:
       const MutableBufferSequence& buffers, Endpoint& endpoint,
       socket_base::message_flags flags, func_type complete_func)
     : reactor_op(&reactive_socket_recvfrom_op_base::do_perform, complete_func),
-      socket_(socket),
+      _socket(socket),
       protocol_type_(protocol_type),
       buffers_(buffers),
       sender_endpoint_(endpoint),
@@ -53,7 +53,7 @@ public:
         MutableBufferSequence> bufs(o->buffers_);
 
     std::size_t addr_len = o->sender_endpoint_.capacity();
-    bool result = socket_ops::non_blocking_recvfrom(o->socket_,
+    bool result = socket_ops::non_blocking_recvfrom(o->_socket,
         bufs.buffers(), bufs.count(), o->flags_,
         o->sender_endpoint_.data(), &addr_len,
         o->ec_, o->bytes_transferred_);
@@ -65,7 +65,7 @@ public:
   }
 
 private:
-  socket_type socket_;
+  socket_type _socket;
   int protocol_type_;
   MutableBufferSequence buffers_;
   Endpoint& sender_endpoint_;

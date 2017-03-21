@@ -36,7 +36,7 @@ public:
       const ConstBufferSequence& buffers,
       socket_base::message_flags flags, func_type complete_func)
     : reactor_op(&reactive_socket_send_op_base::do_perform, complete_func),
-      socket_(socket),
+      _socket(socket),
       buffers_(buffers),
       flags_(flags)
   {
@@ -50,13 +50,13 @@ public:
     buffer_sequence_adapter<asio::const_buffer,
         ConstBufferSequence> bufs(o->buffers_);
 
-    return socket_ops::non_blocking_send(o->socket_,
+    return socket_ops::non_blocking_send(o->_socket,
           bufs.buffers(), bufs.count(), o->flags_,
           o->ec_, o->bytes_transferred_);
   }
 
 private:
-  socket_type socket_;
+  socket_type _socket;
   ConstBufferSequence buffers_;
   socket_base::message_flags flags_;
 };

@@ -37,7 +37,7 @@ public:
       const MutableBufferSequence& buffers, socket_base::message_flags in_flags,
       socket_base::message_flags& out_flags, func_type complete_func)
     : reactor_op(&reactive_socket_recvmsg_op_base::do_perform, complete_func),
-      socket_(socket),
+      _socket(socket),
       buffers_(buffers),
       in_flags_(in_flags),
       out_flags_(out_flags)
@@ -52,14 +52,14 @@ public:
     buffer_sequence_adapter<asio::mutable_buffer,
         MutableBufferSequence> bufs(o->buffers_);
 
-    return socket_ops::non_blocking_recvmsg(o->socket_,
+    return socket_ops::non_blocking_recvmsg(o->_socket,
         bufs.buffers(), bufs.count(),
         o->in_flags_, o->out_flags_,
         o->ec_, o->bytes_transferred_);
   }
 
 private:
-  socket_type socket_;
+  socket_type _socket;
   MutableBufferSequence buffers_;
   socket_base::message_flags in_flags_;
   socket_base::message_flags& out_flags_;

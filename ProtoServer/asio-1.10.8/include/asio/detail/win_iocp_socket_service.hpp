@@ -64,13 +64,13 @@ public:
   {
   public:
     native_handle_type(socket_type s)
-      : socket_(s),
+      : _socket(s),
         have_remote_endpoint_(false)
     {
     }
 
     native_handle_type(socket_type s, const endpoint_type& ep)
-      : socket_(s),
+      : _socket(s),
         have_remote_endpoint_(true),
         remote_endpoint_(ep)
     {
@@ -78,14 +78,14 @@ public:
 
     void operator=(socket_type s)
     {
-      socket_ = s;
+      _socket = s;
       have_remote_endpoint_ = false;
       remote_endpoint_ = endpoint_type();
     }
 
     operator socket_type() const
     {
-      return socket_;
+      return _socket;
     }
 
     bool have_remote_endpoint() const
@@ -99,7 +99,7 @@ public:
     }
 
   private:
-    socket_type socket_;
+    socket_type _socket;
     bool have_remote_endpoint_;
     endpoint_type remote_endpoint_;
   };
@@ -215,15 +215,15 @@ public:
   native_handle_type native_handle(implementation_type& impl)
   {
     if (impl.have_remote_endpoint_)
-      return native_handle_type(impl.socket_, impl.remote_endpoint_);
-    return native_handle_type(impl.socket_);
+      return native_handle_type(impl._socket, impl.remote_endpoint_);
+    return native_handle_type(impl._socket);
   }
 
   // Bind the socket to the specified local endpoint.
   asio::error_code bind(implementation_type& impl,
       const endpoint_type& endpoint, asio::error_code& ec)
   {
-    socket_ops::bind(impl.socket_, endpoint.data(), endpoint.size(), ec);
+    socket_ops::bind(impl._socket, endpoint.data(), endpoint.size(), ec);
     return ec;
   }
 
@@ -232,7 +232,7 @@ public:
   asio::error_code set_option(implementation_type& impl,
       const Option& option, asio::error_code& ec)
   {
-    socket_ops::setsockopt(impl.socket_, impl.state_,
+    socket_ops::setsockopt(impl._socket, impl.state_,
         option.level(impl.protocol_), option.name(impl.protocol_),
         option.data(impl.protocol_), option.size(impl.protocol_), ec);
     return ec;
@@ -244,7 +244,7 @@ public:
       Option& option, asio::error_code& ec) const
   {
     std::size_t size = option.size(impl.protocol_);
-    socket_ops::getsockopt(impl.socket_, impl.state_,
+    socket_ops::getsockopt(impl._socket, impl.state_,
         option.level(impl.protocol_), option.name(impl.protocol_),
         option.data(impl.protocol_), &size, ec);
     if (!ec)
@@ -258,7 +258,7 @@ public:
   {
     endpoint_type endpoint;
     std::size_t addr_len = endpoint.capacity();
-    if (socket_ops::getsockname(impl.socket_, endpoint.data(), &addr_len, ec))
+    if (socket_ops::getsockname(impl._socket, endpoint.data(), &addr_len, ec))
       return endpoint_type();
     endpoint.resize(addr_len);
     return endpoint;
@@ -270,7 +270,7 @@ public:
   {
     endpoint_type endpoint = impl.remote_endpoint_;
     std::size_t addr_len = endpoint.capacity();
-    if (socket_ops::getpeername(impl.socket_, endpoint.data(),
+    if (socket_ops::getpeername(impl._socket, endpoint.data(),
           &addr_len, impl.have_remote_endpoint_, ec))
       return endpoint_type();
     endpoint.resize(addr_len);
@@ -287,7 +287,7 @@ public:
     buffer_sequence_adapter<asio::const_buffer,
         ConstBufferSequence> bufs(buffers);
 
-    return socket_ops::sync_sendto(impl.socket_, impl.state_,
+    return socket_ops::sync_sendto(impl._socket, impl.state_,
         bufs.buffers(), bufs.count(), flags,
         destination.data(), destination.size(), ec);
   }
@@ -298,7 +298,7 @@ public:
       asio::error_code& ec)
   {
     // Wait for socket to become ready.
-    socket_ops::poll_write(impl.socket_, impl.state_, ec);
+    socket_ops::poll_write(impl._socket, impl.state_, ec);
 
     return 0;
   }
@@ -360,7 +360,7 @@ public:
 
     std::size_t addr_len = sender_endpoint.capacity();
     std::size_t bytes_recvd = socket_ops::sync_recvfrom(
-        impl.socket_, impl.state_, bufs.buffers(), bufs.count(),
+        impl._socket, impl.state_, bufs.buffers(), bufs.count(),
         flags, sender_endpoint.data(), &addr_len, ec);
 
     if (!ec)
@@ -375,7 +375,7 @@ public:
       socket_base::message_flags, asio::error_code& ec)
   {
     // Wait for socket to become ready.
-    socket_ops::poll_read(impl.socket_, impl.state_, ec);
+    socket_ops::poll_read(impl._socket, impl.state_, ec);
 
     // Reset endpoint since it can be given no sensible value at this time.
     sender_endpoint = endpoint_type();
@@ -445,7 +445,7 @@ public:
     }
 
     std::size_t addr_len = peer_endpoint ? peer_endpoint->capacity() : 0;
-    socket_holder new_socket(socket_ops::sync_accept(impl.socket_,
+    socket_holder new_socket(socket_ops::sync_accept(impl._socket,
           impl.state_, peer_endpoint ? peer_endpoint->data() : 0,
           peer_endpoint ? &addr_len : 0, ec));
 
@@ -474,7 +474,7 @@ public:
         sizeof(op), handler), 0 };
     bool enable_connection_aborted =
       (impl.state_ & socket_ops::enable_connection_aborted) != 0;
-    p.p = new (p.v) op(*this, impl.socket_, peer, impl.protocol_,
+    p.p = new (p.v) op(*this, impl._socket, peer, impl.protocol_,
         peer_endpoint, enable_connection_aborted, handler);
 
     ASIO_HANDLER_CREATION((p.p, "socket", &impl, "async_accept"));
@@ -490,7 +490,7 @@ public:
   asio::error_code connect(implementation_type& impl,
       const endpoint_type& peer_endpoint, asio::error_code& ec)
   {
-    socket_ops::sync_connect(impl.socket_,
+    socket_ops::sync_connect(impl._socket,
         peer_endpoint.data(), peer_endpoint.size(), ec);
     return ec;
   }
@@ -505,7 +505,7 @@ public:
     typename op::ptr p = { asio::detail::addressof(handler),
       asio_handler_alloc_helpers::allocate(
         sizeof(op), handler), 0 };
-    p.p = new (p.v) op(impl.socket_, handler);
+    p.p = new (p.v) op(impl._socket, handler);
 
     ASIO_HANDLER_CREATION((p.p, "socket", &impl, "async_connect"));
 

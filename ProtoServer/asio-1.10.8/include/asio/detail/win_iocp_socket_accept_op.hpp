@@ -47,7 +47,7 @@ public:
       bool enable_connection_aborted, Handler& handler)
     : operation(&win_iocp_socket_accept_op::do_complete),
       socket_service_(socket_service),
-      socket_(socket),
+      _socket(socket),
       peer_(peer),
       protocol_(protocol),
       peer_endpoint_(peer_endpoint),
@@ -85,7 +85,7 @@ public:
     {
       typename Protocol::endpoint peer_endpoint;
       std::size_t addr_len = peer_endpoint.capacity();
-      socket_ops::complete_iocp_accept(o->socket_,
+      socket_ops::complete_iocp_accept(o->_socket,
           o->output_buffer(), o->address_length(),
           peer_endpoint.data(), &addr_len,
           o->new_socket_.get(), ec);
@@ -96,7 +96,7 @@ public:
           && !o->enable_connection_aborted_)
       {
         o->reset();
-        o->socket_service_.restart_accept_op(o->socket_,
+        o->socket_service_.restart_accept_op(o->_socket,
             o->new_socket_, o->protocol_.family(),
             o->protocol_.type(), o->protocol_.protocol(),
             o->output_buffer(), o->address_length(), o);
@@ -145,7 +145,7 @@ public:
 
 private:
   win_iocp_socket_service_base& socket_service_;
-  socket_type socket_;
+  socket_type _socket;
   socket_holder new_socket_;
   Socket& peer_;
   Protocol protocol_;

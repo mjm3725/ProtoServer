@@ -88,7 +88,7 @@ void win_iocp_handle_service::shutdown_service()
 void win_iocp_handle_service::construct(
     win_iocp_handle_service::implementation_type& impl)
 {
-  impl.handle_ = INVALID_HANDLE_VALUE;
+  impl._handle = INVALID_HANDLE_VALUE;
   impl.safe_cancellation_thread_id_ = 0;
 
   // Insert implementation into linked list of all implementations.
@@ -104,8 +104,8 @@ void win_iocp_handle_service::move_construct(
     win_iocp_handle_service::implementation_type& impl,
     win_iocp_handle_service::implementation_type& other_impl)
 {
-  impl.handle_ = other_impl.handle_;
-  other_impl.handle_ = INVALID_HANDLE_VALUE;
+  impl._handle = other_impl._handle;
+  other_impl._handle = INVALID_HANDLE_VALUE;
 
   impl.safe_cancellation_thread_id_ = other_impl.safe_cancellation_thread_id_;
   other_impl.safe_cancellation_thread_id_ = 0;
@@ -140,8 +140,8 @@ void win_iocp_handle_service::move_assign(
     impl.prev_ = 0;
   }
 
-  impl.handle_ = other_impl.handle_;
-  other_impl.handle_ = INVALID_HANDLE_VALUE;
+  impl._handle = other_impl._handle;
+  other_impl._handle = INVALID_HANDLE_VALUE;
 
   impl.safe_cancellation_thread_id_ = other_impl.safe_cancellation_thread_id_;
   other_impl.safe_cancellation_thread_id_ = 0;
@@ -188,7 +188,7 @@ asio::error_code win_iocp_handle_service::assign(
   if (iocp_service_.register_handle(handle, ec))
     return ec;
 
-  impl.handle_ = handle;
+  impl._handle = handle;
   ec = asio::error_code();
   return ec;
 }
@@ -201,7 +201,7 @@ asio::error_code win_iocp_handle_service::close(
   {
     ASIO_HANDLER_OPERATION(("handle", &impl, "close"));
 
-    if (!::CloseHandle(impl.handle_))
+    if (!::CloseHandle(impl._handle))
     {
       DWORD last_error = ::GetLastError();
       ec = asio::error_code(last_error,
@@ -212,7 +212,7 @@ asio::error_code win_iocp_handle_service::close(
       ec = asio::error_code();
     }
 
-    impl.handle_ = INVALID_HANDLE_VALUE;
+    impl._handle = INVALID_HANDLE_VALUE;
     impl.safe_cancellation_thread_id_ = 0;
   }
   else
@@ -241,7 +241,7 @@ asio::error_code win_iocp_handle_service::cancel(
     // The version of Windows supports cancellation from any thread.
     typedef BOOL (WINAPI* cancel_io_ex_t)(HANDLE, LPOVERLAPPED);
     cancel_io_ex_t cancel_io_ex = (cancel_io_ex_t)cancel_io_ex_ptr;
-    if (!cancel_io_ex(impl.handle_, 0))
+    if (!cancel_io_ex(impl._handle, 0))
     {
       DWORD last_error = ::GetLastError();
       if (last_error == ERROR_NOT_FOUND)
@@ -271,7 +271,7 @@ asio::error_code win_iocp_handle_service::cancel(
   {
     // Asynchronous operations have been started from the current thread only,
     // so it is safe to try to cancel them using CancelIo.
-    if (!::CancelIo(impl.handle_))
+    if (!::CancelIo(impl._handle))
     {
       DWORD last_error = ::GetLastError();
       ec = asio::error_code(last_error,
@@ -318,7 +318,7 @@ size_t win_iocp_handle_service::do_write(
   // Write the data. 
   overlapped.Offset = offset & 0xFFFFFFFF;
   overlapped.OffsetHigh = (offset >> 32) & 0xFFFFFFFF;
-  BOOL ok = ::WriteFile(impl.handle_,
+  BOOL ok = ::WriteFile(impl._handle,
       asio::buffer_cast<LPCVOID>(buffer),
       static_cast<DWORD>(asio::buffer_size(buffer)), 0, &overlapped);
   if (!ok) 
@@ -334,7 +334,7 @@ size_t win_iocp_handle_service::do_write(
 
   // Wait for the operation to complete.
   DWORD bytes_transferred = 0;
-  ok = ::GetOverlappedResult(impl.handle_,
+  ok = ::GetOverlappedResult(impl._handle,
       &overlapped, &bytes_transferred, TRUE);
   if (!ok)
   {
@@ -369,7 +369,7 @@ void win_iocp_handle_service::start_write_op(
     DWORD bytes_transferred = 0;
     op->Offset = offset & 0xFFFFFFFF;
     op->OffsetHigh = (offset >> 32) & 0xFFFFFFFF;
-    BOOL ok = ::WriteFile(impl.handle_,
+    BOOL ok = ::WriteFile(impl._handle,
         asio::buffer_cast<LPCVOID>(buffer),
         static_cast<DWORD>(asio::buffer_size(buffer)),
         &bytes_transferred, op);
@@ -412,7 +412,7 @@ size_t win_iocp_handle_service::do_read(
   // Read some data.
   overlapped.Offset = offset & 0xFFFFFFFF;
   overlapped.OffsetHigh = (offset >> 32) & 0xFFFFFFFF;
-  BOOL ok = ::ReadFile(impl.handle_,
+  BOOL ok = ::ReadFile(impl._handle,
       asio::buffer_cast<LPVOID>(buffer),
       static_cast<DWORD>(asio::buffer_size(buffer)), 0, &overlapped);
   if (!ok) 
@@ -435,7 +435,7 @@ size_t win_iocp_handle_service::do_read(
 
   // Wait for the operation to complete.
   DWORD bytes_transferred = 0;
-  ok = ::GetOverlappedResult(impl.handle_,
+  ok = ::GetOverlappedResult(impl._handle,
       &overlapped, &bytes_transferred, TRUE);
   if (!ok)
   {
@@ -477,7 +477,7 @@ void win_iocp_handle_service::start_read_op(
     DWORD bytes_transferred = 0;
     op->Offset = offset & 0xFFFFFFFF;
     op->OffsetHigh = (offset >> 32) & 0xFFFFFFFF;
-    BOOL ok = ::ReadFile(impl.handle_,
+    BOOL ok = ::ReadFile(impl._handle,
         asio::buffer_cast<LPVOID>(buffer),
         static_cast<DWORD>(asio::buffer_size(buffer)),
         &bytes_transferred, op);
@@ -509,8 +509,8 @@ void win_iocp_handle_service::close_for_destruction(implementation_type& impl)
   {
     ASIO_HANDLER_OPERATION(("handle", &impl, "close"));
 
-    ::CloseHandle(impl.handle_);
-    impl.handle_ = INVALID_HANDLE_VALUE;
+    ::CloseHandle(impl._handle);
+    impl._handle = INVALID_HANDLE_VALUE;
     impl.safe_cancellation_thread_id_ = 0;
   }
 }

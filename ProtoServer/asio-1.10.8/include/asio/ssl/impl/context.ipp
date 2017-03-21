@@ -64,7 +64,7 @@ struct context::dh_cleanup
 };
 
 context::context(context::method m)
-  : handle_(0)
+  : _handle(0)
 {
   ::ERR_clear_error();
 
@@ -81,13 +81,13 @@ context::context(context::method m)
 #else // defined(OPENSSL_NO_SSL2)
       // || (OPENSSL_VERSION_NUMBER >= 0x10100000L)
   case context::sslv2:
-    handle_ = ::SSL_CTX_new(::SSLv2_method());
+    _handle = ::SSL_CTX_new(::SSLv2_method());
     break;
   case context::sslv2_client:
-    handle_ = ::SSL_CTX_new(::SSLv2_client_method());
+    _handle = ::SSL_CTX_new(::SSLv2_client_method());
     break;
   case context::sslv2_server:
-    handle_ = ::SSL_CTX_new(::SSLv2_server_method());
+    _handle = ::SSL_CTX_new(::SSLv2_server_method());
     break;
 #endif // defined(OPENSSL_NO_SSL2)
        // || (OPENSSL_VERSION_NUMBER >= 0x10100000L)
@@ -100,34 +100,34 @@ context::context(context::method m)
     break;
 #else // defined(OPENSSL_NO_SSL3)
   case context::sslv3:
-    handle_ = ::SSL_CTX_new(::SSLv3_method());
+    _handle = ::SSL_CTX_new(::SSLv3_method());
     break;
   case context::sslv3_client:
-    handle_ = ::SSL_CTX_new(::SSLv3_client_method());
+    _handle = ::SSL_CTX_new(::SSLv3_client_method());
     break;
   case context::sslv3_server:
-    handle_ = ::SSL_CTX_new(::SSLv3_server_method());
+    _handle = ::SSL_CTX_new(::SSLv3_server_method());
     break;
 #endif // defined(OPENSSL_NO_SSL3)
 #if (OPENSSL_VERSION_NUMBER < 0x10100000L)
   case context::tlsv1:
-    handle_ = ::SSL_CTX_new(::TLSv1_method());
+    _handle = ::SSL_CTX_new(::TLSv1_method());
     break;
   case context::tlsv1_client:
-    handle_ = ::SSL_CTX_new(::TLSv1_client_method());
+    _handle = ::SSL_CTX_new(::TLSv1_client_method());
     break;
   case context::tlsv1_server:
-    handle_ = ::SSL_CTX_new(::TLSv1_server_method());
+    _handle = ::SSL_CTX_new(::TLSv1_server_method());
     break;
 #endif // (OPENSSL_VERSION_NUMBER < 0x10100000L)
   case context::sslv23:
-    handle_ = ::SSL_CTX_new(::SSLv23_method());
+    _handle = ::SSL_CTX_new(::SSLv23_method());
     break;
   case context::sslv23_client:
-    handle_ = ::SSL_CTX_new(::SSLv23_client_method());
+    _handle = ::SSL_CTX_new(::SSLv23_client_method());
     break;
   case context::sslv23_server:
-    handle_ = ::SSL_CTX_new(::SSLv23_server_method());
+    _handle = ::SSL_CTX_new(::SSLv23_server_method());
     break;
 #if (OPENSSL_VERSION_NUMBER < 0x10100000L)
 #if defined(SSL_TXT_TLSV1_1)
@@ -170,25 +170,25 @@ context::context(context::method m)
   case context::tlsv1:
   case context::tlsv11:
   case context::tlsv12:
-    handle_ = ::SSL_CTX_new(::TLS_method());
+    _handle = ::SSL_CTX_new(::TLS_method());
     break;
   case context::tlsv1_client:
   case context::tlsv11_client:
   case context::tlsv12_client:
-    handle_ = ::SSL_CTX_new(::TLS_client_method());
+    _handle = ::SSL_CTX_new(::TLS_client_method());
     break;
   case context::tlsv1_server:
   case context::tlsv11_server:
   case context::tlsv12_server:
-    handle_ = ::SSL_CTX_new(::TLS_server_method());
+    _handle = ::SSL_CTX_new(::TLS_server_method());
     break;
 #endif // (OPENSSL_VERSION_NUMBER < 0x10100000L)
   default:
-    handle_ = ::SSL_CTX_new(0);
+    _handle = ::SSL_CTX_new(0);
     break;
   }
 
-  if (handle_ == 0)
+  if (_handle == 0)
   {
     asio::error_code ec(
         static_cast<int>(::ERR_get_error()),
@@ -200,37 +200,37 @@ context::context(context::method m)
 }
 
 context::context(asio::io_service&, context::method m)
-  : handle_(0)
+  : _handle(0)
 {
   context tmp(m);
-  handle_ = tmp.handle_;
-  tmp.handle_ = 0;
+  _handle = tmp._handle;
+  tmp._handle = 0;
 }
 
 #if defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
 context::context(context&& other)
 {
-  handle_ = other.handle_;
-  other.handle_ = 0;
+  _handle = other._handle;
+  other._handle = 0;
 }
 
 context& context::operator=(context&& other)
 {
   context tmp(ASIO_MOVE_CAST(context)(*this));
-  handle_ = other.handle_;
-  other.handle_ = 0;
+  _handle = other._handle;
+  other._handle = 0;
   return *this;
 }
 #endif // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
 
 context::~context()
 {
-  if (handle_)
+  if (_handle)
   {
 #if (OPENSSL_VERSION_NUMBER >= 0x10100000L)
     void* cb_userdata = ::SSL_CTX_get_default_passwd_cb_userdata(handle_);
 #else // (OPENSSL_VERSION_NUMBER >= 0x10100000L)
-    void* cb_userdata = handle_->default_passwd_callback_userdata;
+    void* cb_userdata = _handle->default_passwd_callback_userdata;
 #endif // (OPENSSL_VERSION_NUMBER >= 0x10100000L)
     if (cb_userdata)
     {
@@ -241,31 +241,31 @@ context::~context()
 #if (OPENSSL_VERSION_NUMBER >= 0x10100000L)
       ::SSL_CTX_set_default_passwd_cb_userdata(handle_, 0);
 #else // (OPENSSL_VERSION_NUMBER >= 0x10100000L)
-      handle_->default_passwd_callback_userdata = 0;
+      _handle->default_passwd_callback_userdata = 0;
 #endif // (OPENSSL_VERSION_NUMBER >= 0x10100000L)
     }
 
-    if (SSL_CTX_get_app_data(handle_))
+    if (SSL_CTX_get_app_data(_handle))
     {
       detail::verify_callback_base* callback =
         static_cast<detail::verify_callback_base*>(
-            SSL_CTX_get_app_data(handle_));
+            SSL_CTX_get_app_data(_handle));
       delete callback;
-      SSL_CTX_set_app_data(handle_, 0);
+      SSL_CTX_set_app_data(_handle, 0);
     }
 
-    ::SSL_CTX_free(handle_);
+    ::SSL_CTX_free(_handle);
   }
 }
 
 context::native_handle_type context::native_handle()
 {
-  return handle_;
+  return _handle;
 }
 
 context::impl_type context::impl()
 {
-  return handle_;
+  return _handle;
 }
 
 void context::clear_options(context::options o)
@@ -323,7 +323,7 @@ asio::error_code context::set_options(
   }
 #endif // !defined(SSL_OP_NO_COMPRESSION)
 
-  ::SSL_CTX_set_options(handle_, o);
+  ::SSL_CTX_set_options(_handle, o);
 
   ec = asio::error_code();
   return ec;
@@ -339,7 +339,7 @@ void context::set_verify_mode(verify_mode v)
 asio::error_code context::set_verify_mode(
     verify_mode v, asio::error_code& ec)
 {
-  ::SSL_CTX_set_verify(handle_, v, ::SSL_CTX_get_verify_callback(handle_));
+  ::SSL_CTX_set_verify(_handle, v, ::SSL_CTX_get_verify_callback(_handle));
 
   ec = asio::error_code();
   return ec;
@@ -355,7 +355,7 @@ void context::set_verify_depth(int depth)
 asio::error_code context::set_verify_depth(
     int depth, asio::error_code& ec)
 {
-  ::SSL_CTX_set_verify_depth(handle_, depth);
+  ::SSL_CTX_set_verify_depth(_handle, depth);
 
   ec = asio::error_code();
   return ec;
@@ -373,7 +373,7 @@ asio::error_code context::load_verify_file(
 {
   ::ERR_clear_error();
 
-  if (::SSL_CTX_load_verify_locations(handle_, filename.c_str(), 0) != 1)
+  if (::SSL_CTX_load_verify_locations(_handle, filename.c_str(), 0) != 1)
   {
     ec = asio::error_code(
         static_cast<int>(::ERR_get_error()),
@@ -403,7 +403,7 @@ asio::error_code context::add_certificate_authority(
     x509_cleanup cert = { ::PEM_read_bio_X509(bio.p, 0, 0, 0) };
     if (cert.p)
     {
-      if (X509_STORE* store = ::SSL_CTX_get_cert_store(handle_))
+      if (X509_STORE* store = ::SSL_CTX_get_cert_store(_handle))
       {
         if (::X509_STORE_add_cert(store, cert.p) == 1)
         {
@@ -432,7 +432,7 @@ asio::error_code context::set_default_verify_paths(
 {
   ::ERR_clear_error();
 
-  if (::SSL_CTX_set_default_verify_paths(handle_) != 1)
+  if (::SSL_CTX_set_default_verify_paths(_handle) != 1)
   {
     ec = asio::error_code(
         static_cast<int>(::ERR_get_error()),
@@ -456,7 +456,7 @@ asio::error_code context::add_verify_path(
 {
   ::ERR_clear_error();
 
-  if (::SSL_CTX_load_verify_locations(handle_, 0, path.c_str()) != 1)
+  if (::SSL_CTX_load_verify_locations(_handle, 0, path.c_str()) != 1)
   {
     ec = asio::error_code(
         static_cast<int>(::ERR_get_error()),
@@ -484,7 +484,7 @@ asio::error_code context::use_certificate(
 
   if (format == context_base::asn1)
   {
-    if (::SSL_CTX_use_certificate_ASN1(handle_,
+    if (::SSL_CTX_use_certificate_ASN1(_handle,
           static_cast<int>(buffer_size(certificate)),
           buffer_cast<const unsigned char*>(certificate)) == 1)
     {
@@ -500,7 +500,7 @@ asio::error_code context::use_certificate(
       x509_cleanup cert = { ::PEM_read_bio_X509(bio.p, 0, 0, 0) };
       if (cert.p)
       {
-        if (::SSL_CTX_use_certificate(handle_, cert.p) == 1)
+        if (::SSL_CTX_use_certificate(_handle, cert.p) == 1)
         {
           ec = asio::error_code();
           return ec;
@@ -550,7 +550,7 @@ asio::error_code context::use_certificate_file(
 
   ::ERR_clear_error();
 
-  if (::SSL_CTX_use_certificate_file(handle_, filename.c_str(), file_type) != 1)
+  if (::SSL_CTX_use_certificate_file(_handle, filename.c_str(), file_type) != 1)
   {
     ec = asio::error_code(
         static_cast<int>(::ERR_get_error()),
@@ -581,8 +581,8 @@ asio::error_code context::use_certificate_chain(
     pem_password_cb* callback = ::SSL_CTX_get_default_passwd_cb(handle_);
     void* cb_userdata = ::SSL_CTX_get_default_passwd_cb_userdata(handle_);
 #else // (OPENSSL_VERSION_NUMBER >= 0x10100000L)
-    pem_password_cb* callback = handle_->default_passwd_callback;
-    void* cb_userdata = handle_->default_passwd_callback_userdata;
+    pem_password_cb* callback = _handle->default_passwd_callback;
+    void* cb_userdata = _handle->default_passwd_callback_userdata;
 #endif // (OPENSSL_VERSION_NUMBER >= 0x10100000L)
     x509_cleanup cert = {
       ::PEM_read_bio_X509_AUX(bio.p, 0,
@@ -595,7 +595,7 @@ asio::error_code context::use_certificate_chain(
       return ec;
     }
 
-    int result = ::SSL_CTX_use_certificate(handle_, cert.p);
+    int result = ::SSL_CTX_use_certificate(_handle, cert.p);
     if (result == 0 || ::ERR_peek_error() != 0)
     {
       ec = asio::error_code(
@@ -607,10 +607,10 @@ asio::error_code context::use_certificate_chain(
 #if (OPENSSL_VERSION_NUMBER >= 0x10002000L) && !defined(LIBRESSL_VERSION_NUMBER)
     ::SSL_CTX_clear_chain_certs(handle_);
 #else
-    if (handle_->extra_certs)
+    if (_handle->extra_certs)
     {
-      ::sk_X509_pop_free(handle_->extra_certs, X509_free);
-      handle_->extra_certs = 0;
+      ::sk_X509_pop_free(_handle->extra_certs, X509_free);
+      _handle->extra_certs = 0;
     }
 #endif // (OPENSSL_VERSION_NUMBER >= 0x10002000L)
 
@@ -618,7 +618,7 @@ asio::error_code context::use_certificate_chain(
           callback,
           cb_userdata))
     {
-      if (!::SSL_CTX_add_extra_chain_cert(handle_, cacert))
+      if (!::SSL_CTX_add_extra_chain_cert(_handle, cacert))
       {
         ec = asio::error_code(
             static_cast<int>(::ERR_get_error()),
@@ -655,7 +655,7 @@ asio::error_code context::use_certificate_chain_file(
 {
   ::ERR_clear_error();
 
-  if (::SSL_CTX_use_certificate_chain_file(handle_, filename.c_str()) != 1)
+  if (::SSL_CTX_use_certificate_chain_file(_handle, filename.c_str()) != 1)
   {
     ec = asio::error_code(
         static_cast<int>(::ERR_get_error()),
@@ -685,8 +685,8 @@ asio::error_code context::use_private_key(
     pem_password_cb* callback = ::SSL_CTX_get_default_passwd_cb(handle_);
     void* cb_userdata = ::SSL_CTX_get_default_passwd_cb_userdata(handle_);
 #else // (OPENSSL_VERSION_NUMBER >= 0x10100000L)
-    pem_password_cb* callback = handle_->default_passwd_callback;
-    void* cb_userdata = handle_->default_passwd_callback_userdata;
+    pem_password_cb* callback = _handle->default_passwd_callback;
+    void* cb_userdata = _handle->default_passwd_callback_userdata;
 #endif // (OPENSSL_VERSION_NUMBER >= 0x10100000L)
 
   bio_cleanup bio = { make_buffer_bio(private_key) };
@@ -712,7 +712,7 @@ asio::error_code context::use_private_key(
 
     if (evp_private_key.p)
     {
-      if (::SSL_CTX_use_PrivateKey(handle_, evp_private_key.p) == 1)
+      if (::SSL_CTX_use_PrivateKey(_handle, evp_private_key.p) == 1)
       {
         ec = asio::error_code();
         return ec;
@@ -752,8 +752,8 @@ asio::error_code context::use_rsa_private_key(
     pem_password_cb* callback = ::SSL_CTX_get_default_passwd_cb(handle_);
     void* cb_userdata = ::SSL_CTX_get_default_passwd_cb_userdata(handle_);
 #else // (OPENSSL_VERSION_NUMBER >= 0x10100000L)
-    pem_password_cb* callback = handle_->default_passwd_callback;
-    void* cb_userdata = handle_->default_passwd_callback_userdata;
+    pem_password_cb* callback = _handle->default_passwd_callback;
+    void* cb_userdata = _handle->default_passwd_callback_userdata;
 #endif // (OPENSSL_VERSION_NUMBER >= 0x10100000L)
 
   bio_cleanup bio = { make_buffer_bio(private_key) };
@@ -779,7 +779,7 @@ asio::error_code context::use_rsa_private_key(
 
     if (rsa_private_key.p)
     {
-      if (::SSL_CTX_use_RSAPrivateKey(handle_, rsa_private_key.p) == 1)
+      if (::SSL_CTX_use_RSAPrivateKey(_handle, rsa_private_key.p) == 1)
       {
         ec = asio::error_code();
         return ec;
@@ -815,7 +815,7 @@ asio::error_code context::use_private_key_file(
 
   ::ERR_clear_error();
 
-  if (::SSL_CTX_use_PrivateKey_file(handle_, filename.c_str(), file_type) != 1)
+  if (::SSL_CTX_use_PrivateKey_file(_handle, filename.c_str(), file_type) != 1)
   {
     ec = asio::error_code(
         static_cast<int>(::ERR_get_error()),
@@ -858,7 +858,7 @@ asio::error_code context::use_rsa_private_key_file(
   ::ERR_clear_error();
 
   if (::SSL_CTX_use_RSAPrivateKey_file(
-        handle_, filename.c_str(), file_type) != 1)
+        _handle, filename.c_str(), file_type) != 1)
   {
     ec = asio::error_code(
         static_cast<int>(::ERR_get_error()),
@@ -926,7 +926,7 @@ asio::error_code context::do_use_tmp_dh(
   dh_cleanup dh = { ::PEM_read_bio_DHparams(bio, 0, 0, 0) };
   if (dh.p)
   {
-    if (::SSL_CTX_set_tmp_dh(handle_, dh.p) == 1)
+    if (::SSL_CTX_set_tmp_dh(_handle, dh.p) == 1)
     {
       ec = asio::error_code();
       return ec;
@@ -942,16 +942,16 @@ asio::error_code context::do_use_tmp_dh(
 asio::error_code context::do_set_verify_callback(
     detail::verify_callback_base* callback, asio::error_code& ec)
 {
-  if (SSL_CTX_get_app_data(handle_))
+  if (SSL_CTX_get_app_data(_handle))
   {
     delete static_cast<detail::verify_callback_base*>(
-        SSL_CTX_get_app_data(handle_));
+        SSL_CTX_get_app_data(_handle));
   }
 
-  SSL_CTX_set_app_data(handle_, callback);
+  SSL_CTX_set_app_data(_handle, callback);
 
-  ::SSL_CTX_set_verify(handle_,
-      ::SSL_CTX_get_verify_mode(handle_),
+  ::SSL_CTX_set_verify(_handle,
+      ::SSL_CTX_get_verify_mode(_handle),
       &context::verify_callback_function);
 
   ec = asio::error_code();
@@ -991,15 +991,15 @@ asio::error_code context::do_set_password_callback(
   void* old_callback = ::SSL_CTX_get_default_passwd_cb_userdata(handle_);
   ::SSL_CTX_set_default_passwd_cb_userdata(handle_, callback);
 #else // (OPENSSL_VERSION_NUMBER >= 0x10100000L)
-  void* old_callback = handle_->default_passwd_callback_userdata;
-  handle_->default_passwd_callback_userdata = callback;
+  void* old_callback = _handle->default_passwd_callback_userdata;
+  _handle->default_passwd_callback_userdata = callback;
 #endif // (OPENSSL_VERSION_NUMBER >= 0x10100000L)
 
   if (old_callback)
     delete static_cast<detail::password_callback_base*>(
         old_callback);
 
-  SSL_CTX_set_default_passwd_cb(handle_, &context::password_callback_function);
+  SSL_CTX_set_default_passwd_cb(_handle, &context::password_callback_function);
 
   ec = asio::error_code();
   return ec;

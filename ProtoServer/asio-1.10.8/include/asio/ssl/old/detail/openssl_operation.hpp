@@ -96,8 +96,8 @@ public:
     : primitive_(primitive)
     , user_handler_(handler)
     , strand_(&strand)
-    , recv_buf_(recv_buf)
-    , socket_(socket)
+    , _recvBuf(recv_buf)
+    , _socket(socket)
     , ssl_bio_(ssl_bio)
     , session_(session)
   {
@@ -123,8 +123,8 @@ public:
                     BIO* ssl_bio)
     : primitive_(primitive)
     , strand_(0)
-    , recv_buf_(recv_buf)
-    , socket_(socket)
+    , _recvBuf(recv_buf)
+    , _socket(socket)
     , ssl_bio_(ssl_bio)
     , session_(session)
   {      
@@ -204,19 +204,19 @@ public:
     if (!is_operation_done && !is_write_needed)
     {
       // We may have left over data that we can pass to SSL immediately
-      if (recv_buf_.get_data_len() > 0)
+      if (_recvBuf.get_data_len() > 0)
       {
         // Pass the buffered data to SSL
         int written = ::BIO_write
         ( 
           ssl_bio_, 
-          recv_buf_.get_data_start(), 
-          recv_buf_.get_data_len() 
+          _recvBuf.get_data_start(), 
+          _recvBuf.get_data_len() 
         );
 
         if (written > 0)
         {
-          recv_buf_.data_removed(written);
+          _recvBuf.data_removed(written);
         }
         else if (written < 0)
         {
@@ -253,15 +253,15 @@ private:
   read_func  read_;
   int_handler_func handler_;
     
-  net_buffer send_buf_; // buffers for network IO
+  net_buffer _sendBuf; // buffers for network IO
 
   // The recv buffer is owned by the stream, not the operation, since there can
   // be left over bytes after passing the data up to the application, and these
   // bytes need to be kept around for the next read operation issued by the
   // application.
-  net_buffer& recv_buf_;
+  net_buffer& _recvBuf;
 
-  Stream& socket_;
+  Stream& _socket;
   BIO*    ssl_bio_;
   SSL*    session_;
 
@@ -294,9 +294,9 @@ private:
     if ( len )
     { 
       // There is something to write into net, do it...
-      len = (int)send_buf_.get_unused_len() > len? 
+      len = (int)_sendBuf.get_unused_len() > len? 
         len: 
-        send_buf_.get_unused_len();
+        _sendBuf.get_unused_len();
         
       if (len == 0)
       {
@@ -306,17 +306,17 @@ private:
       }
 
       // Read outgoing data from bio
-      len = ::BIO_read( ssl_bio_, send_buf_.get_unused_start(), len); 
+      len = ::BIO_read( ssl_bio_, _sendBuf.get_unused_start(), len); 
          
       if (len > 0)
       {
-        unsigned char *data_start = send_buf_.get_unused_start();
-        send_buf_.data_added(len);
+        unsigned char *data_start = _sendBuf.get_unused_start();
+        _sendBuf.data_added(len);
  
         ASIO_ASSERT(strand_);
         asio::async_write
         ( 
-          socket_, 
+          _socket, 
           asio::buffer(data_start, len),
           strand_->wrap
           (
@@ -363,7 +363,7 @@ private:
     if (!error)
     {
       // Remove data from send buffer
-      send_buf_.data_removed(bytes_sent);
+      _sendBuf.data_removed(bytes_sent);
 
       if (is_operation_done)
         handler_(asio::error_code(), rc);
@@ -379,10 +379,10 @@ private:
   {
     // Wait for new data
     ASIO_ASSERT(strand_);
-    socket_.async_read_some
+    _socket.async_read_some
     ( 
-      asio::buffer(recv_buf_.get_unused_start(),
-        recv_buf_.get_unused_len()),
+      asio::buffer(_recvBuf.get_unused_start(),
+        _recvBuf.get_unused_len()),
       strand_->wrap
       (
         boost::bind
@@ -402,19 +402,19 @@ private:
   {
     if (!error)
     {
-      recv_buf_.data_added(bytes_recvd);
+      _recvBuf.data_added(bytes_recvd);
 
       // Pass the received data to SSL
       int written = ::BIO_write
       ( 
         ssl_bio_, 
-        recv_buf_.get_data_start(), 
-        recv_buf_.get_data_len() 
+        _recvBuf.get_data_start(), 
+        _recvBuf.get_data_len() 
       );
 
       if (written > 0)
       {
-        recv_buf_.data_removed(written);
+        _recvBuf.data_removed(written);
       }
       else if (written < 0)
       {
@@ -444,22 +444,22 @@ private:
     if ( len )
     { 
       // There is something to write into net, do it...
-      len = (int)send_buf_.get_unused_len() > len? 
+      len = (int)_sendBuf.get_unused_len() > len? 
         len: 
-        send_buf_.get_unused_len();
+        _sendBuf.get_unused_len();
         
       // Read outgoing data from bio
-      len = ::BIO_read( ssl_bio_, send_buf_.get_unused_start(), len); 
+      len = ::BIO_read( ssl_bio_, _sendBuf.get_unused_start(), len); 
          
       if (len > 0)
       {
         size_t sent_len = asio::write( 
-                  socket_, 
-                  asio::buffer(send_buf_.get_unused_start(), len)
+                  _socket, 
+                  asio::buffer(_sendBuf.get_unused_start(), len)
                   );
 
-        send_buf_.data_added(len);
-        send_buf_.data_removed(sent_len);
+        _sendBuf.data_added(len);
+        _sendBuf.data_removed(sent_len);
       }          
       else if (!BIO_should_retry(ssl_bio_))
       {
@@ -479,26 +479,26 @@ private:
 
   int do_sync_read()
   {
-    size_t len = socket_.read_some
+    size_t len = _socket.read_some
       ( 
-        asio::buffer(recv_buf_.get_unused_start(),
-          recv_buf_.get_unused_len())
+        asio::buffer(_recvBuf.get_unused_start(),
+          _recvBuf.get_unused_len())
       );
 
     // Write data to ssl
-    recv_buf_.data_added(len);
+    _recvBuf.data_added(len);
 
     // Pass the received data to SSL
     int written = ::BIO_write
     ( 
       ssl_bio_, 
-      recv_buf_.get_data_start(), 
-      recv_buf_.get_data_len() 
+      _recvBuf.get_data_start(), 
+      _recvBuf.get_data_len() 
     );
 
     if (written > 0)
     {
-      recv_buf_.data_removed(written);
+      _recvBuf.data_removed(written);
     }
     else if (written < 0)
     {
