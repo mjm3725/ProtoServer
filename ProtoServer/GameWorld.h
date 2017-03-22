@@ -1,16 +1,22 @@
 #pragma once
 
 #include <concurrent_queue.h>
+#include "TaskQueue.h"
+
 
 class GameWorld
 {
 public:
+	GameWorld(int id, asio::io_service& ioService);
+
+	int GetId();
+
 	void Update();
 
 	void PushTask(function<void()>& task);
 
 private:
-	Concurrency::concurrent_queue<function<void()>> _taskQueue;
-
+	asio::io_service::strand _strand;
 	chrono::time_point<chrono::system_clock> _lastTime;
+	int _id;
 };

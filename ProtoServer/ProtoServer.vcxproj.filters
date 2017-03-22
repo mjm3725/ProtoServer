@@ -389,10 +389,10 @@
     <ClInclude Include="Network\Session.h">
       <Filter>소스 파일\Network</Filter>
     </ClInclude>
-    <ClInclude Include="GameProcessor.h" />
     <ClInclude Include="GameWorld.h" />
     <ClInclude Include="GameActor.h" />
     <ClInclude Include="TaskQueue.h" />
+    <ClInclude Include="GameWorldManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -413,9 +413,6 @@
     <ClCompile Include="Network\Session.cpp">
       <Filter>소스 파일\Network</Filter>
     </ClCompile>
-    <ClCompile Include="GameProcessor.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="GameWorld.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -423,6 +420,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="TaskQueue.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="GameWorldManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

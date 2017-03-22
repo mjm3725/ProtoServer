@@ -5,6 +5,8 @@
 #include "Network\TCPServer.h"
 #include "Network\Session.h"
 #include "Network\NullTerminateProtocolFilter.h"
+#include "GameWorld.h"
+#include "GameWorldManager.h"
 
 int main()
 {
@@ -40,6 +42,10 @@ int main()
 			visit_session->Send(s.data(), static_cast<int>(s.length()));
 		});
 	};
+
+	GameWorldManager worldManager(server.GetIOService());
+	worldManager.CreateWorld(1);
+
 
 	while (true)
 	{

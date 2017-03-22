@@ -70,6 +70,11 @@ void TCPServer::DoAccept()
 	});
 }
 
+asio::io_service & TCPServer::GetIOService()
+{
+	return _ioService;
+}
+
 void TCPServer::AddSession(shared_ptr<Session>& session)
 {
 	lock_guard<mutex> lock(_lock);

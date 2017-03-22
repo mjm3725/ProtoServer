@@ -17,16 +17,24 @@ void TaskQueue::Push(function<void()>& task)
 	{
 		_ioService.post([taskQueue = shared_from_this()]() 
 		{
-			int execNum = 0;
-			function<void()> task;
-
-			while (taskQueue->_taskQueue.try_pop(task))
+			while (true)
 			{
-				task();
-				execNum++;
+				int execNum = 0;
+				function<void()> task;
+
+				while (taskQueue->_taskQueue.try_pop(task))
+				{
+					task();
+					execNum++;
+				}
+
+				int remainNum = taskQueue->_taskNum - execNum;
+
+				if (remainNum == 0)
+				{
+					break;
+				}
 			}
-
-
 		});
 	}
 }

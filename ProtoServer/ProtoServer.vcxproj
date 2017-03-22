@@ -503,6 +503,7 @@
     <ClInclude Include="asio-1.10.8\include\asio\yield.hpp" />
     <ClInclude Include="GameActor.h" />
     <ClInclude Include="GameWorld.h" />
+    <ClInclude Include="GameWorldManager.h" />
     <ClInclude Include="Network\IProtocolFilter.h" />
     <ClInclude Include="Network\Session.h" />
     <ClInclude Include="Network\TCPServer.h" />
@@ -511,11 +512,11 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TaskQueue.h" />
     <ClInclude Include="Util\LogHelper.h" />
-    <ClInclude Include="GameProcessor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameActor.cpp" />
     <ClCompile Include="GameWorld.cpp" />
+    <ClCompile Include="GameWorldManager.cpp" />
     <ClCompile Include="Network\Session.cpp" />
     <ClCompile Include="Network\TCPServer.cpp" />
     <ClCompile Include="Network\NullTerminateProtocolFilter.cpp" />
@@ -528,7 +529,6 @@
     </ClCompile>
     <ClCompile Include="TaskQueue.cpp" />
     <ClCompile Include="Util\LogHelper.cpp" />
-    <ClCompile Include="GameProcessor.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

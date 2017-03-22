@@ -22,6 +22,8 @@ public:
 	function<void(shared_ptr<ISession>&, error_code& errorCode)> OnClosed;
 	function<void(shared_ptr<ISession>&, asio::const_buffer& buf, int packetLen)> OnRecv;
 
+	asio::io_service& GetIOService();
+
 private:
 	void AddSession(shared_ptr<Session>& session);
 	void DeleteSession(int64_t handle);
