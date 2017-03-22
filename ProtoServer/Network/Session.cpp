@@ -3,10 +3,11 @@
 #include "TCPServer.h"
 
 
-Session::Session(int64_t handle, tcp::socket& socket, TCPServer& server) 
+Session::Session(int64_t handle, tcp::socket& socket, TCPServer& server, const function<void(shared_ptr<Session>&, error_code&)>& onClosed)
 	: _handle(handle), 
 	_socket(std::move(socket)), 
-	_server(server)
+	_server(server),
+	_onClosed(onClosed)
 {
 }
 
@@ -59,11 +60,11 @@ void Session::Send(const void* data, int size)
 
 	if (isSend)
 	{
-		DoSend();
+		AsyncSend();
 	}
 }
 
-void Session::DoSend()
+void Session::AsyncSend()
 {
 	_socket.async_send(_sendBuf.data(), [session = shared_from_this()](error_code ec, size_t bytesTransferred)
 	{
@@ -75,7 +76,7 @@ void Session::DoSend()
 
 			if (session->_sendBuf.size() > 0)
 			{
-				session->DoSend();
+				session->AsyncSend();
 			}
 		}
 		else
@@ -85,7 +86,7 @@ void Session::DoSend()
 	});
 }
 
-void Session::DoRecv()
+void Session::AsyncRecv()
 {
 	// resize안되게 남은 input buffer크기만큼만 prepare함
 	auto buf = _recvBuf.prepare(RECV_BUF_SIZE - _recvBuf.size());
@@ -100,16 +101,16 @@ void Session::DoRecv()
 
 			if (read_size > 0)
 			{
-				session->OnRecv(session, session->_recvBuf.data(), read_size);
+				session->GetServer().OnRecv(static_pointer_cast<ISession>(session), session->_recvBuf.data(), read_size);
 
 				session->_recvBuf.consume(read_size);
 			}
 
-			session->DoRecv();
+			session->AsyncRecv();
 		}
 		else
 		{
-			session->OnClosed(session, ec);
+			session->_onClosed(session, ec);
 			session->_socket.close();
 		}
 	});

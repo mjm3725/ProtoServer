@@ -9,8 +9,9 @@ void CmdReqLogin::ExecuteCommand(shared_ptr<ISession>& session, asio::const_buff
 
 	if (!reqLogin.ParseFromArray(asio::buffer_cast<const char*>(buf), packetLen))
 	{
-		LogHelper::GetInstance()->GetConsoleLogger()->error("reqLogin parse error");
+		LogHelper::GetInstance()->GetConsoleLogger()->error("ReqLogin parse error");
 		return;
 	}
+
 
 }

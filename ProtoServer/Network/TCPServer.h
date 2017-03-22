@@ -32,7 +32,7 @@ private:
 	void DeleteSession(int64_t handle);
 	void CopySession(vector<shared_ptr<ISession>>& sessions);
 
-	void DoAccept();
+	void AsyncAccept();
 
 	tcp::acceptor _acceptor;
 	asio::io_service& _ioService;

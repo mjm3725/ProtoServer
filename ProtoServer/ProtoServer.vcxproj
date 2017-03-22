@@ -103,7 +103,6 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>./asio-1.10.8/include;./spdlog;./protobuf/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalOptions>/await %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>

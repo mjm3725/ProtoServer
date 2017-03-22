@@ -28,22 +28,21 @@ public:
 		SEND_BUF_SIZE = 8192,
 	};
 
-	Session(int64_t handle, tcp::socket& socket, TCPServer& server);
+	Session(int64_t handle, tcp::socket& socket, TCPServer& server, const function<void(shared_ptr<Session>&, error_code&)>& onClosed);
 
-	void DoRecv();
-	void DoSend();
-
+	void AsyncRecv();
+	
 	void Send(const void* data, int size) override;
 	int64_t GetHandle() override;
 	TCPServer& GetServer() override;
 	void SetSessionState(shared_ptr<ISessionState>& sessionState) override;
 	ISessionState& GetSessionState() override;
-
-	function<void(shared_ptr<Session>&, error_code&)> OnClosed;
-	function<void(shared_ptr<Session>&, asio::const_buffer& buf, int packetLen)> OnRecv;
-
 	
 private:
+	void AsyncSend();
+
+	function<void(shared_ptr<Session>&, error_code&)> _onClosed;
+
 	tcp::socket _socket;
 	asio::streambuf _recvBuf;
 	asio::streambuf _sendBuf;

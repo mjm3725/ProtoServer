@@ -16,7 +16,7 @@ void TCPServer::Start(int threadNum, int port, shared_ptr<IProtocolFilter>& prot
 	_protocolFilter = protocolFilter;
 	_acceptor.bind(tcp::endpoint(tcp::v4(), port));
 	
-	DoAccept();
+	AsyncAccept();
 
 	_threads.reserve(threadNum);
 
@@ -39,32 +39,25 @@ void TCPServer::Stop()
 	}
 }
 
-void TCPServer::DoAccept()
+void TCPServer::AsyncAccept()
 {
 	_acceptor.async_accept(_socket, [this](error_code ec) mutable
 	{
 		if (!ec)
 		{
-			auto new_session = make_shared<Session>(++_currentHandle, _socket, *this);
-
-			new_session->OnClosed = [this](shared_ptr<Session>& session, error_code& errorCode)
+			auto new_session = make_shared<Session>(++_currentHandle, _socket, *this, [this](shared_ptr<Session>& session, error_code& errorCode)
 			{
 				DeleteSession(session->GetHandle());
 				OnClosed(static_pointer_cast<ISession>(session), errorCode);
-			};
-				
-			new_session->OnRecv = [this](shared_ptr<Session>& session, asio::const_buffer& buf, int packetLen)
-			{
-				OnRecv(static_pointer_cast<ISession>(session), buf, packetLen);
-			};
+			});
 
 			AddSession(new_session);
 
 			OnConnected(static_pointer_cast<ISession>(new_session));
 
-			new_session->DoRecv();
+			new_session->AsyncRecv();
 
-			DoAccept();
+			AsyncAccept();
 		}
 		else
 		{
