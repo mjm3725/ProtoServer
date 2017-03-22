@@ -11,7 +11,7 @@ public:
 	shared_ptr<spdlog::logger>& GetConsoleLogger();
 
 private:
-	static LogHelper s_instance;;
+	static LogHelper s_instance;
 
 	LogHelper();
 

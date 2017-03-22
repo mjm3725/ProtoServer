@@ -3,19 +3,26 @@
 #include "Session.h"
 
 
+TCPServer::TCPServer(asio::io_service& ioService)
+	: _ioService(ioService),
+	_socket(ioService),
+	_acceptor(ioService)
+{
+
+}
 
 void TCPServer::Start(int threadNum, int port, shared_ptr<IProtocolFilter>& protocolFilter)
 {
 	_protocolFilter = protocolFilter;
-	_acceptor = make_shared<tcp::acceptor>(_ioService, tcp::endpoint(tcp::v4(), port));
-
+	_acceptor.bind(tcp::endpoint(tcp::v4(), port));
+	
 	DoAccept();
 
 	_threads.reserve(threadNum);
 
 	for (int i = 0; i < threadNum; i++)
 	{
-		_threads.push_back(make_shared<thread>([this]
+		_threads.push_back(thread([this]
 		{
 			_ioService.run();
 		}));
@@ -28,22 +35,18 @@ void TCPServer::Stop()
 
 	for (auto& thread : _threads)
 	{
-		thread->join();
+		thread.join();
 	}
 }
 
 void TCPServer::DoAccept()
 {
-	auto _socket = make_shared<tcp::socket>(_ioService);
-
-	_acceptor->async_accept(*_socket, [this, _socket](error_code ec) mutable
+	_acceptor.async_accept(_socket, [this](error_code ec) mutable
 	{
 		if (!ec)
 		{
-			auto new_session = make_shared<Session>();
+			auto new_session = make_shared<Session>(++_currentHandle, _socket, *this);
 
-			new_session->Initialize(++_currentHandle, _socket, this);
-				
 			new_session->OnClosed = [this](shared_ptr<Session>& session, error_code& errorCode)
 			{
 				DeleteSession(session->GetHandle());
@@ -89,7 +92,7 @@ void TCPServer::DeleteSession(int64_t handle)
 	_sessionMap.erase(handle);
 }
 
-void TCPServer::VisitSession(function<void(shared_ptr<ISession>&)> visitFunc)
+void TCPServer::VisitSession(const function<void(shared_ptr<ISession>&)>& visitFunc)
 {
 	vector<shared_ptr<ISession>> sessions;
 

@@ -8,13 +8,16 @@ using asio::ip::tcp;
 class ISession;
 class Session;
 
+
 class TCPServer
 {
 public:
+	TCPServer(asio::io_service& ioService);
+
 	void Start(int threadNum, int port, shared_ptr<IProtocolFilter>& protocolFilter);
 	void Stop();
 
-	void VisitSession(function<void(shared_ptr<ISession>&)> visitFunc);
+	void VisitSession(const function<void(shared_ptr<ISession>&)>& visitFunc);
 
 	IProtocolFilter* GetProtocolFilter();
 
@@ -31,11 +34,12 @@ private:
 
 	void DoAccept();
 
-	shared_ptr<tcp::acceptor> _acceptor;
-	shared_ptr<IProtocolFilter> _protocolFilter;
-	asio::io_service _ioService;
-	vector<shared_ptr<thread>> _threads;
+	tcp::acceptor _acceptor;
+	asio::io_service& _ioService;
+	tcp::socket _socket;
 
+	shared_ptr<IProtocolFilter> _protocolFilter;
+	vector<thread> _threads;
 	atomic<int64_t> _currentHandle;
 
 	typedef unordered_map<int64_t, shared_ptr<Session>>::value_type SessionMapValueType;

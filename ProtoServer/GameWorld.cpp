@@ -16,7 +16,7 @@ void GameWorld::Update()
 
 }
 
-void GameWorld::PushTask(function<void()>& task)
+void GameWorld::PushTask(const function<void()>& task)
 {
 	_strand.post(task);
 }

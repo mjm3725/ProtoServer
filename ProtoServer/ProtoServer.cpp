@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "Network\TCPServer.h"
 #include "Network\Session.h"
-#include "Network\NullTerminateProtocolFilter.h"
+#include "Network\FixedHeaderProtocolFilter.h"
 #include "GameWorld.h"
 #include "GameWorldManager.h"
 
@@ -16,9 +16,14 @@ int main()
 	LogHelper::GetInstance()->GetConsoleLogger()->info("Port : {}", port);
 	LogHelper::GetInstance()->GetConsoleLogger()->info("IO Thread num : {}", 8);
 	
-	TCPServer server;
-	server.Start(8, port, static_pointer_cast<IProtocolFilter>(make_shared<NullTerminateProtocolFilter>()));
+	asio::io_service ioService;
+
+	TCPServer server(ioService);
 	
+	GameWorldManager worldManager(ioService);
+	worldManager.CreateWorld(1);
+
+
 	server.OnConnected = [](shared_ptr<ISession>& session)
 	{
 		LogHelper::GetInstance()->GetConsoleLogger()->info("connected");
@@ -29,24 +34,27 @@ int main()
 		LogHelper::GetInstance()->GetConsoleLogger()->info("closed");
 	};
 
-	server.OnRecv = [] (shared_ptr<ISession>& session, asio::const_buffer& buf, int packet_len)
+	server.OnRecv = [&worldManager](shared_ptr<ISession>& session, asio::const_buffer& buf, int packetLen)
 	{
 		const char* data = asio::buffer_cast<const char*>(buf);
+		string s(data, packetLen);
 
-		string s(data, packet_len);
+		auto world = worldManager.GetWorld(1);
 
-		cout << "chat: " << s << endl;
+		world->PushTask([session, s]() {
+			
+			cout << "chat: " << s << endl;
 
-		session->GetServer()->VisitSession([&s](auto visit_session)
-		{
-			visit_session->Send(s.data(), static_cast<int>(s.length()));
+			session->GetServer().VisitSession([&s](auto visit_session)
+			{
+				visit_session->Send(s.data(), static_cast<int>(s.length()));
+			});
 		});
+		
 	};
-
-	GameWorldManager worldManager(server.GetIOService());
-	worldManager.CreateWorld(1);
-
-
+	
+	server.Start(8, port, static_pointer_cast<IProtocolFilter>(make_shared<FixedHeaderProtocolFilter>()));
+	
 	while (true)
 	{
 		string s;

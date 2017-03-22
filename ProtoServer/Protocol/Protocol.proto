@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+enum PacketCommand
+{
+	REQ_LOGIN = 0;
+	RES_LOGIN = 1;
+	
+	REQ_READY_ENTER_WORLD = 2;
+	RES_READY_ENTER_WORLD = 3;
+
+	REQ_ENTER_WORLD = 4;
+	RES_ENTER_WORLD = 5;
+
+	NOTIFY_ENTER_GAME_OBJECT = 6;
+	NOTIFY_LEAVE_GAME_OBJECT = 7;
+}
+
+enum PacketResult
+{
+	SUCCESS = 0;
+	FAIL = 1;
+}
+
+message ReqLogin
+{
+	string id = 1;
+}
+
+message ResLogin
+{
+	PacketResult result = 1;
+}
+
+message ReqReadyEnterWorld
+{
+}
+
+message PkVector3
+{
+	float x = 1;
+	float y = 2;
+	float z = 3;
+}
+
+message GameObjectInfo
+{
+	int64 handle = 1;
+	int32 type = 2;
+	PkVector3 pos = 3;
+	string name = 4;
+}
+
+message ResReadyEnterWorld
+{
+	PacketResult result = 1;
+	GameObjectInfo game_object_info = 2;
+}
+
+message ReqEnterWorld
+{
+}
+
+message ResEnterWorld
+{
+	PacketResult result = 1;
+}
+
+message NotifyEnterCharacter
+{
+	repeated GameObjectInfo game_object_infos = 1;
+}
+
+message NotifyLeaveCharacter
+{
+	repeated int64 game_object_handles = 1;
+}

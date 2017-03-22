@@ -101,16 +101,16 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>ASIO_STANDALONE;ASIO_HEADER_ONLY;ASIO_MSVC=_MSC_VER;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>./asio-1.10.8/include;./spdlog;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./asio-1.10.8/include;./spdlog;./protobuf/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <AdditionalOptions>/await %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>libprotobufd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>./protobuf/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -501,25 +501,35 @@
     <ClInclude Include="asio-1.10.8\include\asio\write.hpp" />
     <ClInclude Include="asio-1.10.8\include\asio\write_at.hpp" />
     <ClInclude Include="asio-1.10.8\include\asio\yield.hpp" />
-    <ClInclude Include="GameActor.h" />
+    <ClInclude Include="Network\FixedHeaderProtocolFilter.h" />
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameWorld.h" />
     <ClInclude Include="GameWorldManager.h" />
     <ClInclude Include="Network\IProtocolFilter.h" />
     <ClInclude Include="Network\Session.h" />
     <ClInclude Include="Network\TCPServer.h" />
     <ClInclude Include="Network\NullTerminateProtocolFilter.h" />
+    <ClInclude Include="Packet\CmdReqLogin.h" />
+    <ClInclude Include="Packet\IPacketCommand.h" />
+    <ClInclude Include="Packet\PacketDispatcher.h" />
+    <ClInclude Include="protocol\Protocol.pb.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="TaskQueue.h" />
     <ClInclude Include="Util\LogHelper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GameActor.cpp" />
+    <ClCompile Include="Network\FixedHeaderProtocolFilter.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameWorld.cpp" />
     <ClCompile Include="GameWorldManager.cpp" />
     <ClCompile Include="Network\Session.cpp" />
     <ClCompile Include="Network\TCPServer.cpp" />
     <ClCompile Include="Network\NullTerminateProtocolFilter.cpp" />
+    <ClCompile Include="Packet\CmdReqLogin.cpp" />
+    <ClCompile Include="Packet\PacketDispatcher.cpp" />
+    <ClCompile Include="protocol\Protocol.pb.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="ProtoServer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -527,7 +537,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="TaskQueue.cpp" />
     <ClCompile Include="Util\LogHelper.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

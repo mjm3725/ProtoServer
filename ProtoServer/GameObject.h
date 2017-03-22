@@ -1,12 +1,12 @@
 #pragma once
 
-class GameActor
+class GameObject
 {
 public: 
 	void Update(float elapsedTime);
 
 
-protected:
-	
 private:
+	__int64 _handle;
+	string _name;
 };
