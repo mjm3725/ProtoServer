@@ -14,11 +14,11 @@ private:
 	template <int packetCommand, class PacketCommandClass>
 	void AddHandler()
 	{
-		_packetMap.insert(PacketMapType::value_type(packetCommand, make_shared<PacketCommandClass>()));
+		_handlerMap.insert(PacketMapType::value_type(packetCommand, make_shared<PacketCommandClass>()));
 	}
 
 
 	typedef unordered_map<int, shared_ptr<IPacketCommand>>  PacketMapType;
 
-	PacketMapType _packetMap;
+	PacketMapType _handlerMap;
 };

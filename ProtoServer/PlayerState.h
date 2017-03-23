@@ -19,5 +19,5 @@ public:
 
 private:
 	shared_ptr<GameObject> _gameObject;
-	PlayerStateType _state;
+	PlayerStateType _state = PlayerStateType::None;
 };

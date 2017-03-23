@@ -12,9 +12,9 @@ class Session;
 class TCPServer
 {
 public:
-	TCPServer(asio::io_service& ioService);
+	TCPServer(asio::io_service& ioService, int port, shared_ptr<IProtocolFilter>& protocolFilter);
 
-	void Start(int threadNum, int port, shared_ptr<IProtocolFilter>& protocolFilter);
+	void Start(int threadNum);
 	void Stop();
 
 	void VisitSession(const function<void(shared_ptr<ISession>&)>& visitFunc);

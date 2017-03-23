@@ -12,7 +12,7 @@ int FixedHeaderProtocolFilter::Parse(asio::const_buffer& buf)
 		return 0;
 	}
 
-	int bodyLength = *(int*)(data + BodyLengthOffset);
+	int bodyLength = *(int*)(data + CommandSize);
 
 	if (size < bodyLength + HeaderSize)
 	{

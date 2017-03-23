@@ -3,19 +3,17 @@
 #include "Session.h"
 
 
-TCPServer::TCPServer(asio::io_service& ioService)
+TCPServer::TCPServer(asio::io_service& ioService, int port, shared_ptr<IProtocolFilter>& protocolFilter)
 	: _ioService(ioService),
 	_socket(ioService),
-	_acceptor(ioService)
+	_acceptor(ioService, tcp::endpoint(tcp::v4(), port)),
+	_protocolFilter(protocolFilter)
 {
 
 }
 
-void TCPServer::Start(int threadNum, int port, shared_ptr<IProtocolFilter>& protocolFilter)
+void TCPServer::Start(int threadNum)
 {
-	_protocolFilter = protocolFilter;
-	_acceptor.bind(tcp::endpoint(tcp::v4(), port));
-	
 	AsyncAccept();
 
 	_threads.reserve(threadNum);
@@ -61,7 +59,7 @@ void TCPServer::AsyncAccept()
 		}
 		else
 		{
-			cout << "Do accept error: " << ec.message();
+			cout << "Async accept error: " << ec.message();
 		}
 	});
 }
