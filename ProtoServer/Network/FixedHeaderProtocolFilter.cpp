@@ -7,17 +7,17 @@ int FixedHeaderProtocolFilter::Parse(asio::const_buffer& buf)
 	const char* data = asio::buffer_cast<const char*>(buf);
 	size_t size = asio::buffer_size(buf);
 
-	if (size < HEADER_SIZE)
+	if (size < HeaderSize)
 	{
 		return 0;
 	}
 
-	int bodyLength = *(int*)(data + HEADER_BODY_LENGTH_OFFSET);
+	int bodyLength = *(int*)(data + BodyLengthOffset);
 
-	if (size < bodyLength + HEADER_SIZE)
+	if (size < bodyLength + HeaderSize)
 	{
 		return 0;
 	}
 
-	return bodyLength + HEADER_SIZE;
+	return bodyLength + HeaderSize;
 }

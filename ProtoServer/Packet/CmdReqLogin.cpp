@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "CmdReqLogin.h"
-#include "../Protocol/Protocol.pb.h"
+#include "Protocol/Protocol.pb.h"
 
 
 void CmdReqLogin::ExecuteCommand(shared_ptr<ISession>& session, asio::const_buffer & buf, int packetLen)

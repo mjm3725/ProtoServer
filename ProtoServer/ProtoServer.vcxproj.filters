@@ -397,6 +397,7 @@
     <ClInclude Include="Packet\IPacketCommand.h" />
     <ClInclude Include="Packet\CmdReqLogin.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="PlayerState.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -436,6 +437,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerState.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

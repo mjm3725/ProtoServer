@@ -7,6 +7,7 @@
 #include "Network\FixedHeaderProtocolFilter.h"
 #include "GameWorld.h"
 #include "GameWorldManager.h"
+#include "PlayerState.h"
 
 int main()
 {
@@ -26,6 +27,8 @@ int main()
 
 	server.OnConnected = [](shared_ptr<ISession>& session)
 	{
+		session->SetSessionState(static_pointer_cast<ISessionState>(make_shared<PlayerState>()));
+
 		LogHelper::GetInstance()->GetConsoleLogger()->info("connected");
 	};
 
