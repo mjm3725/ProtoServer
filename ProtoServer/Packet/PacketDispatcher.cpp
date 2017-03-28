@@ -6,7 +6,7 @@
 
 void PacketDispatcher::Initialize()
 {
-	AddHandler<PacketCommand::REQ_LOGIN, CmdReqLogin>();
+	AddHandler<PacketCommand::REQ_LOGIN, CmdReqLogin, ReqLogin>();
 }
 
 void PacketDispatcher::Dispatch(shared_ptr<ISession>& session, asio::const_buffer & buf, int packetLen)
@@ -24,5 +24,5 @@ void PacketDispatcher::Dispatch(shared_ptr<ISession>& session, asio::const_buffe
 		return;
 	}
 
-	v->second->ExecuteCommand(session, buf, packetLen);
+	v->second(session, buf, packetLen);
 }

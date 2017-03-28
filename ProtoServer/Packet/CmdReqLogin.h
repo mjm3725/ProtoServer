@@ -2,8 +2,10 @@
 
 #include "IPacketCommand.h"
 
-class CmdReqLogin : public IPacketCommand
+class ReqLogin;
+
+class CmdReqLogin : public IPacketCommand<ReqLogin>
 {
 public:
-	void ExecuteCommand(shared_ptr<ISession>& session, asio::const_buffer& buf, int packetLen) override;
+	void ExecuteCommand(shared_ptr<ISession>& session, shared_ptr<ReqLogin>& message) override;
 };
