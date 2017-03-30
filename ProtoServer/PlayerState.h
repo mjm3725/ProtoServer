@@ -15,9 +15,6 @@ enum class PlayerStateType
 class PlayerState : public ISessionState
 {
 public:
-	PlayerStateType GetState();
-
-private:
-	shared_ptr<GameObject> _gameObject;
-	PlayerStateType _state = PlayerStateType::None;
+	PlayerStateType State = PlayerStateType::None;
+	shared_ptr<GameObject> GameObject;
 };

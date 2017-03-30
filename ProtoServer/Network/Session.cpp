@@ -31,8 +31,7 @@ int64_t Session::GetHandle()
 	return _handle;
 }
 
-
-void Session::Send(const void* data, int size)
+void Session::Send(const char* data, int size)
 {
 	lock_guard<mutex> lock(_sendBufLock);
 
@@ -51,7 +50,7 @@ void Session::Send(const void* data, int size)
 	{
 		isSend = true;
 	}
-	
+
 	auto buf = _sendBuf.prepare(SEND_BUF_SIZE - sendBufSize);
 
 	asio::buffer_copy(buf, asio::buffer(data, size));

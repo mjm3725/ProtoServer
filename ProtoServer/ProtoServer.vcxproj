@@ -509,8 +509,10 @@
     <ClInclude Include="Network\TCPServer.h" />
     <ClInclude Include="Network\NullTerminateProtocolFilter.h" />
     <ClInclude Include="Packet\CmdReqLogin.h" />
+    <ClInclude Include="Packet\CmdReqReadyEnterWorld.h" />
     <ClInclude Include="Packet\IPacketCommand.h" />
     <ClInclude Include="Packet\PacketDispatcher.h" />
+    <ClInclude Include="Packet\PacketHelper.h" />
     <ClInclude Include="PlayerState.h" />
     <ClInclude Include="protocol\Protocol.pb.h" />
     <ClInclude Include="stdafx.h" />
@@ -525,8 +527,10 @@
     <ClCompile Include="Network\Session.cpp" />
     <ClCompile Include="Network\TCPServer.cpp" />
     <ClCompile Include="Network\NullTerminateProtocolFilter.cpp" />
+    <ClCompile Include="Packet\CmdReqReadyEnterWorld.cpp" />
     <ClCompile Include="Packet\CmdReqLogin.cpp" />
     <ClCompile Include="Packet\PacketDispatcher.cpp" />
+    <ClCompile Include="Packet\PacketHelper.cpp" />
     <ClCompile Include="PlayerState.cpp" />
     <ClCompile Include="protocol\Protocol.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>

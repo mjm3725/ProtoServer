@@ -13,7 +13,7 @@ class ISession
 {
 public:
 	virtual int64_t GetHandle() = 0;
-	virtual void Send(const void* data, int size) = 0;
+	virtual void Send(const char* data, int size) = 0;
 	virtual TCPServer& GetServer() = 0;
 	virtual void SetSessionState(shared_ptr<ISessionState>& sessionState) = 0;
 	virtual ISessionState& GetSessionState() = 0;
@@ -32,7 +32,8 @@ public:
 
 	void AsyncRecv();
 	
-	void Send(const void* data, int size) override;
+	void Send(const char* data, int size) override;
+
 	int64_t GetHandle() override;
 	TCPServer& GetServer() override;
 	void SetSessionState(shared_ptr<ISessionState>& sessionState) override;

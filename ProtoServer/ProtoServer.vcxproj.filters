@@ -398,6 +398,8 @@
     <ClInclude Include="Packet\CmdReqLogin.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="PlayerState.h" />
+    <ClInclude Include="Packet\PacketHelper.h" />
+    <ClInclude Include="Packet\CmdReqReadyEnterWorld.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -440,6 +442,12 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="PlayerState.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Packet\PacketHelper.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Packet\CmdReqReadyEnterWorld.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
