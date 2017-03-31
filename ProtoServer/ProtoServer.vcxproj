@@ -508,6 +508,7 @@
     <ClInclude Include="Network\Session.h" />
     <ClInclude Include="Network\TCPServer.h" />
     <ClInclude Include="Network\NullTerminateProtocolFilter.h" />
+    <ClInclude Include="Packet\CmdReqEnterWorld.h" />
     <ClInclude Include="Packet\CmdReqLogin.h" />
     <ClInclude Include="Packet\CmdReqReadyEnterWorld.h" />
     <ClInclude Include="Packet\IPacketCommand.h" />
@@ -527,6 +528,7 @@
     <ClCompile Include="Network\Session.cpp" />
     <ClCompile Include="Network\TCPServer.cpp" />
     <ClCompile Include="Network\NullTerminateProtocolFilter.cpp" />
+    <ClCompile Include="Packet\CmdReqEnterWorld.cpp" />
     <ClCompile Include="Packet\CmdReqReadyEnterWorld.cpp" />
     <ClCompile Include="Packet\CmdReqLogin.cpp" />
     <ClCompile Include="Packet\PacketDispatcher.cpp" />

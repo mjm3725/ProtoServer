@@ -400,6 +400,7 @@
     <ClInclude Include="PlayerState.h" />
     <ClInclude Include="Packet\PacketHelper.h" />
     <ClInclude Include="Packet\CmdReqReadyEnterWorld.h" />
+    <ClInclude Include="Packet\CmdReqEnterWorld.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -448,6 +449,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Packet\CmdReqReadyEnterWorld.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Packet\CmdReqEnterWorld.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

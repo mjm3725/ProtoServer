@@ -15,6 +15,8 @@ enum class PlayerStateType
 class PlayerState : public ISessionState
 {
 public:
+	void Dispose();
+
 	PlayerStateType State = PlayerStateType::None;
 	shared_ptr<GameObject> GameObject;
 };

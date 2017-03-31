@@ -3,12 +3,14 @@
 #include "Protocol\Protocol.pb.h"
 #include "CmdReqLogin.h"
 #include "CmdReqReadyEnterWorld.h"
+#include "CmdReqEnterWorld.h"
 
 
 void PacketDispatcher::Initialize()
 {
 	AddHandler<PacketCommand::REQ_LOGIN, CmdReqLogin, ReqLogin>();
 	AddHandler<PacketCommand::REQ_READY_ENTER_WORLD, CmdReqReadyEnterWorld, ReqReadyEnterWorld>();
+	AddHandler<PacketCommand::REQ_ENTER_WORLD, CmdReqEnterWorld, ReqEnterWorld>();
 }
 
 void PacketDispatcher::Dispatch(shared_ptr<ISession>& session, asio::const_buffer & buf, int packetLen)

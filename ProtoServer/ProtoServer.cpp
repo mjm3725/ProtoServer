@@ -23,8 +23,8 @@ int main()
 
 	TCPServer server(ioService, port, static_pointer_cast<IProtocolFilter>(make_shared<FixedHeaderProtocolFilter>()));
 	
-	GameWorldManager worldManager(ioService);
-	worldManager.CreateWorld(1);
+	GameWorldManager::CreateInstance(ioService);
+	GameWorldManager::GetInstance()->CreateWorld(1);
 
 	PacketDispatcher dispatcher;
 	dispatcher.Initialize();
@@ -39,10 +39,12 @@ int main()
 
 	server.OnClosed = [](shared_ptr<ISession>& session, error_code& errorCode)
 	{
+		((PlayerState&)session->GetSessionState()).Dispose();
+
 		LogHelper::GetInstance()->GetConsoleLogger()->info("closed");
 	};
 
-	server.OnRecv = [&worldManager, &dispatcher](shared_ptr<ISession>& session, asio::const_buffer& buf, int packetLen)
+	server.OnRecv = [&dispatcher](shared_ptr<ISession>& session, asio::const_buffer& buf, int packetLen)
 	{
 		dispatcher.Dispatch(session, buf, packetLen);
 	};
