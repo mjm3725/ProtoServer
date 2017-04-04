@@ -66,12 +66,12 @@ message ResEnterWorld
 	PacketResult result = 1;
 }
 
-message NotifyEnterCharacter
+message NotifyEnterGameObject
 {
 	repeated GameObjectInfo game_object_infos = 1;
 }
 
-message NotifyLeaveCharacter
+message NotifyLeaveGameObject
 {
 	repeated int64 game_object_handles = 1;
 }

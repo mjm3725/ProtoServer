@@ -37,8 +37,8 @@ void protobuf_AssignDesc_Protocol_2eproto();
 void protobuf_ShutdownFile_Protocol_2eproto();
 
 class GameObjectInfo;
-class NotifyEnterCharacter;
-class NotifyLeaveCharacter;
+class NotifyEnterGameObject;
+class NotifyLeaveGameObject;
 class PkVector3;
 class ReqEnterWorld;
 class ReqLogin;
@@ -829,34 +829,34 @@ extern ::google::protobuf::internal::ExplicitlyConstructed<ResEnterWorld> ResEnt
 
 // -------------------------------------------------------------------
 
-class NotifyEnterCharacter : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:NotifyEnterCharacter) */ {
+class NotifyEnterGameObject : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:NotifyEnterGameObject) */ {
  public:
-  NotifyEnterCharacter();
-  virtual ~NotifyEnterCharacter();
+  NotifyEnterGameObject();
+  virtual ~NotifyEnterGameObject();
 
-  NotifyEnterCharacter(const NotifyEnterCharacter& from);
+  NotifyEnterGameObject(const NotifyEnterGameObject& from);
 
-  inline NotifyEnterCharacter& operator=(const NotifyEnterCharacter& from) {
+  inline NotifyEnterGameObject& operator=(const NotifyEnterGameObject& from) {
     CopyFrom(from);
     return *this;
   }
 
   static const ::google::protobuf::Descriptor* descriptor();
-  static const NotifyEnterCharacter& default_instance();
+  static const NotifyEnterGameObject& default_instance();
 
-  static const NotifyEnterCharacter* internal_default_instance();
+  static const NotifyEnterGameObject* internal_default_instance();
 
-  void Swap(NotifyEnterCharacter* other);
+  void Swap(NotifyEnterGameObject* other);
 
   // implements Message ----------------------------------------------
 
-  inline NotifyEnterCharacter* New() const { return New(NULL); }
+  inline NotifyEnterGameObject* New() const { return New(NULL); }
 
-  NotifyEnterCharacter* New(::google::protobuf::Arena* arena) const;
+  NotifyEnterGameObject* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const NotifyEnterCharacter& from);
-  void MergeFrom(const NotifyEnterCharacter& from);
+  void CopyFrom(const NotifyEnterGameObject& from);
+  void MergeFrom(const NotifyEnterGameObject& from);
   void Clear();
   bool IsInitialized() const;
 
@@ -875,8 +875,8 @@ class NotifyEnterCharacter : public ::google::protobuf::Message /* @@protoc_inse
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const;
-  void InternalSwap(NotifyEnterCharacter* other);
-  void UnsafeMergeFrom(const NotifyEnterCharacter& from);
+  void InternalSwap(NotifyEnterGameObject* other);
+  void UnsafeMergeFrom(const NotifyEnterGameObject& from);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return _internal_metadata_.arena();
@@ -904,7 +904,7 @@ class NotifyEnterCharacter : public ::google::protobuf::Message /* @@protoc_inse
   const ::google::protobuf::RepeatedPtrField< ::GameObjectInfo >&
       game_object_infos() const;
 
-  // @@protoc_insertion_point(class_scope:NotifyEnterCharacter)
+  // @@protoc_insertion_point(class_scope:NotifyEnterGameObject)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
@@ -917,38 +917,38 @@ class NotifyEnterCharacter : public ::google::protobuf::Message /* @@protoc_inse
 
   void InitAsDefaultInstance();
 };
-extern ::google::protobuf::internal::ExplicitlyConstructed<NotifyEnterCharacter> NotifyEnterCharacter_default_instance_;
+extern ::google::protobuf::internal::ExplicitlyConstructed<NotifyEnterGameObject> NotifyEnterGameObject_default_instance_;
 
 // -------------------------------------------------------------------
 
-class NotifyLeaveCharacter : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:NotifyLeaveCharacter) */ {
+class NotifyLeaveGameObject : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:NotifyLeaveGameObject) */ {
  public:
-  NotifyLeaveCharacter();
-  virtual ~NotifyLeaveCharacter();
+  NotifyLeaveGameObject();
+  virtual ~NotifyLeaveGameObject();
 
-  NotifyLeaveCharacter(const NotifyLeaveCharacter& from);
+  NotifyLeaveGameObject(const NotifyLeaveGameObject& from);
 
-  inline NotifyLeaveCharacter& operator=(const NotifyLeaveCharacter& from) {
+  inline NotifyLeaveGameObject& operator=(const NotifyLeaveGameObject& from) {
     CopyFrom(from);
     return *this;
   }
 
   static const ::google::protobuf::Descriptor* descriptor();
-  static const NotifyLeaveCharacter& default_instance();
+  static const NotifyLeaveGameObject& default_instance();
 
-  static const NotifyLeaveCharacter* internal_default_instance();
+  static const NotifyLeaveGameObject* internal_default_instance();
 
-  void Swap(NotifyLeaveCharacter* other);
+  void Swap(NotifyLeaveGameObject* other);
 
   // implements Message ----------------------------------------------
 
-  inline NotifyLeaveCharacter* New() const { return New(NULL); }
+  inline NotifyLeaveGameObject* New() const { return New(NULL); }
 
-  NotifyLeaveCharacter* New(::google::protobuf::Arena* arena) const;
+  NotifyLeaveGameObject* New(::google::protobuf::Arena* arena) const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const NotifyLeaveCharacter& from);
-  void MergeFrom(const NotifyLeaveCharacter& from);
+  void CopyFrom(const NotifyLeaveGameObject& from);
+  void MergeFrom(const NotifyLeaveGameObject& from);
   void Clear();
   bool IsInitialized() const;
 
@@ -967,8 +967,8 @@ class NotifyLeaveCharacter : public ::google::protobuf::Message /* @@protoc_inse
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const;
-  void InternalSwap(NotifyLeaveCharacter* other);
-  void UnsafeMergeFrom(const NotifyLeaveCharacter& from);
+  void InternalSwap(NotifyLeaveGameObject* other);
+  void UnsafeMergeFrom(const NotifyLeaveGameObject& from);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return _internal_metadata_.arena();
@@ -996,7 +996,7 @@ class NotifyLeaveCharacter : public ::google::protobuf::Message /* @@protoc_inse
   ::google::protobuf::RepeatedField< ::google::protobuf::int64 >*
       mutable_game_object_handles();
 
-  // @@protoc_insertion_point(class_scope:NotifyLeaveCharacter)
+  // @@protoc_insertion_point(class_scope:NotifyLeaveGameObject)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
@@ -1010,7 +1010,7 @@ class NotifyLeaveCharacter : public ::google::protobuf::Message /* @@protoc_inse
 
   void InitAsDefaultInstance();
 };
-extern ::google::protobuf::internal::ExplicitlyConstructed<NotifyLeaveCharacter> NotifyLeaveCharacter_default_instance_;
+extern ::google::protobuf::internal::ExplicitlyConstructed<NotifyLeaveGameObject> NotifyLeaveGameObject_default_instance_;
 
 // ===================================================================
 
@@ -1352,77 +1352,77 @@ inline const ResEnterWorld* ResEnterWorld::internal_default_instance() {
 }
 // -------------------------------------------------------------------
 
-// NotifyEnterCharacter
+// NotifyEnterGameObject
 
 // repeated .GameObjectInfo game_object_infos = 1;
-inline int NotifyEnterCharacter::game_object_infos_size() const {
+inline int NotifyEnterGameObject::game_object_infos_size() const {
   return game_object_infos_.size();
 }
-inline void NotifyEnterCharacter::clear_game_object_infos() {
+inline void NotifyEnterGameObject::clear_game_object_infos() {
   game_object_infos_.Clear();
 }
-inline const ::GameObjectInfo& NotifyEnterCharacter::game_object_infos(int index) const {
-  // @@protoc_insertion_point(field_get:NotifyEnterCharacter.game_object_infos)
+inline const ::GameObjectInfo& NotifyEnterGameObject::game_object_infos(int index) const {
+  // @@protoc_insertion_point(field_get:NotifyEnterGameObject.game_object_infos)
   return game_object_infos_.Get(index);
 }
-inline ::GameObjectInfo* NotifyEnterCharacter::mutable_game_object_infos(int index) {
-  // @@protoc_insertion_point(field_mutable:NotifyEnterCharacter.game_object_infos)
+inline ::GameObjectInfo* NotifyEnterGameObject::mutable_game_object_infos(int index) {
+  // @@protoc_insertion_point(field_mutable:NotifyEnterGameObject.game_object_infos)
   return game_object_infos_.Mutable(index);
 }
-inline ::GameObjectInfo* NotifyEnterCharacter::add_game_object_infos() {
-  // @@protoc_insertion_point(field_add:NotifyEnterCharacter.game_object_infos)
+inline ::GameObjectInfo* NotifyEnterGameObject::add_game_object_infos() {
+  // @@protoc_insertion_point(field_add:NotifyEnterGameObject.game_object_infos)
   return game_object_infos_.Add();
 }
 inline ::google::protobuf::RepeatedPtrField< ::GameObjectInfo >*
-NotifyEnterCharacter::mutable_game_object_infos() {
-  // @@protoc_insertion_point(field_mutable_list:NotifyEnterCharacter.game_object_infos)
+NotifyEnterGameObject::mutable_game_object_infos() {
+  // @@protoc_insertion_point(field_mutable_list:NotifyEnterGameObject.game_object_infos)
   return &game_object_infos_;
 }
 inline const ::google::protobuf::RepeatedPtrField< ::GameObjectInfo >&
-NotifyEnterCharacter::game_object_infos() const {
-  // @@protoc_insertion_point(field_list:NotifyEnterCharacter.game_object_infos)
+NotifyEnterGameObject::game_object_infos() const {
+  // @@protoc_insertion_point(field_list:NotifyEnterGameObject.game_object_infos)
   return game_object_infos_;
 }
 
-inline const NotifyEnterCharacter* NotifyEnterCharacter::internal_default_instance() {
-  return &NotifyEnterCharacter_default_instance_.get();
+inline const NotifyEnterGameObject* NotifyEnterGameObject::internal_default_instance() {
+  return &NotifyEnterGameObject_default_instance_.get();
 }
 // -------------------------------------------------------------------
 
-// NotifyLeaveCharacter
+// NotifyLeaveGameObject
 
 // repeated int64 game_object_handles = 1;
-inline int NotifyLeaveCharacter::game_object_handles_size() const {
+inline int NotifyLeaveGameObject::game_object_handles_size() const {
   return game_object_handles_.size();
 }
-inline void NotifyLeaveCharacter::clear_game_object_handles() {
+inline void NotifyLeaveGameObject::clear_game_object_handles() {
   game_object_handles_.Clear();
 }
-inline ::google::protobuf::int64 NotifyLeaveCharacter::game_object_handles(int index) const {
-  // @@protoc_insertion_point(field_get:NotifyLeaveCharacter.game_object_handles)
+inline ::google::protobuf::int64 NotifyLeaveGameObject::game_object_handles(int index) const {
+  // @@protoc_insertion_point(field_get:NotifyLeaveGameObject.game_object_handles)
   return game_object_handles_.Get(index);
 }
-inline void NotifyLeaveCharacter::set_game_object_handles(int index, ::google::protobuf::int64 value) {
+inline void NotifyLeaveGameObject::set_game_object_handles(int index, ::google::protobuf::int64 value) {
   game_object_handles_.Set(index, value);
-  // @@protoc_insertion_point(field_set:NotifyLeaveCharacter.game_object_handles)
+  // @@protoc_insertion_point(field_set:NotifyLeaveGameObject.game_object_handles)
 }
-inline void NotifyLeaveCharacter::add_game_object_handles(::google::protobuf::int64 value) {
+inline void NotifyLeaveGameObject::add_game_object_handles(::google::protobuf::int64 value) {
   game_object_handles_.Add(value);
-  // @@protoc_insertion_point(field_add:NotifyLeaveCharacter.game_object_handles)
+  // @@protoc_insertion_point(field_add:NotifyLeaveGameObject.game_object_handles)
 }
 inline const ::google::protobuf::RepeatedField< ::google::protobuf::int64 >&
-NotifyLeaveCharacter::game_object_handles() const {
-  // @@protoc_insertion_point(field_list:NotifyLeaveCharacter.game_object_handles)
+NotifyLeaveGameObject::game_object_handles() const {
+  // @@protoc_insertion_point(field_list:NotifyLeaveGameObject.game_object_handles)
   return game_object_handles_;
 }
 inline ::google::protobuf::RepeatedField< ::google::protobuf::int64 >*
-NotifyLeaveCharacter::mutable_game_object_handles() {
-  // @@protoc_insertion_point(field_mutable_list:NotifyLeaveCharacter.game_object_handles)
+NotifyLeaveGameObject::mutable_game_object_handles() {
+  // @@protoc_insertion_point(field_mutable_list:NotifyLeaveGameObject.game_object_handles)
   return &game_object_handles_;
 }
 
-inline const NotifyLeaveCharacter* NotifyLeaveCharacter::internal_default_instance() {
-  return &NotifyLeaveCharacter_default_instance_.get();
+inline const NotifyLeaveGameObject* NotifyLeaveGameObject::internal_default_instance() {
+  return &NotifyLeaveGameObject_default_instance_.get();
 }
 #endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS
 // -------------------------------------------------------------------

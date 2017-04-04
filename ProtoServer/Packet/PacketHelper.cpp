@@ -2,6 +2,7 @@
 #include "PacketHelper.h"
 #include "Network\FixedHeaderProtocolFilter.h"
 #include "Network\Session.h"
+#include "GameObject.h"
 
 
 void PacketHelper::SendPacket(shared_ptr<ISession>& session, int packetCommand, google::protobuf::Message& message)

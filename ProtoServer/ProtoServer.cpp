@@ -15,6 +15,7 @@ int main()
 {
 	int port = 8080;
 
+	LogHelper::GetInstance()->GetConsoleLogger()->set_level(spdlog::level::debug);
 	LogHelper::GetInstance()->GetConsoleLogger()->info("Start server");
 	LogHelper::GetInstance()->GetConsoleLogger()->info("Port : {}", port);
 	LogHelper::GetInstance()->GetConsoleLogger()->info("IO Thread num : {}", 8);
@@ -34,14 +35,17 @@ int main()
 	{
 		session->SetSessionState(static_pointer_cast<ISessionState>(make_shared<PlayerState>()));
 
-		LogHelper::GetInstance()->GetConsoleLogger()->info("connected");
+		LogHelper::GetInstance()->GetConsoleLogger()->debug("connected");
 	};
 
 	server.OnClosed = [](shared_ptr<ISession>& session, error_code& errorCode)
 	{
-		((PlayerState*)session->GetSessionState())->Dispose();
+		auto playerState = (PlayerState*)session->GetSessionState();
 
-		LogHelper::GetInstance()->GetConsoleLogger()->info("closed");
+		playerState->Dispose();
+		GameWorldManager::GetInstance()->GetWorld(1)->LeaveGameObject(playerState->GameObject);
+
+		LogHelper::GetInstance()->GetConsoleLogger()->debug("closed");
 	};
 
 	server.OnRecv = [&dispatcher](shared_ptr<ISession>& session, asio::const_buffer& buf, int packetLen)

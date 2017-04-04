@@ -2,6 +2,7 @@
 
 #include "Protocol\Protocol.pb.h"
 
+class GameObject;
 class ISession;
 
 class PacketHelper

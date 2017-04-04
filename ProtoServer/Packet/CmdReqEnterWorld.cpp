@@ -10,6 +10,7 @@ void CmdReqEnterWorld::ExecuteCommand(shared_ptr<ISession>& session, shared_ptr<
 
 	auto world = GameWorldManager::GetInstance()->GetWorld(1);
 
-	world->EnterGameObject(playerState->GameObject);
+	playerState->State = PlayerStateType::World;
 
+	world->EnterGameObject(playerState->GameObject);
 }
