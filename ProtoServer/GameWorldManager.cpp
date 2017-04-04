@@ -19,7 +19,7 @@ GameWorldManager::GameWorldManager(asio::io_service & ioService) : _ioService(io
 
 }
 
-shared_ptr<GameWorld>& GameWorldManager::CreateWorld(int id)
+shared_ptr<GameWorld> GameWorldManager::CreateWorld(int id)
 {
 	auto world = make_shared<GameWorld>(id, _ioService);
 
@@ -29,7 +29,7 @@ shared_ptr<GameWorld>& GameWorldManager::CreateWorld(int id)
 	return ret.first->second;
 }
 
-shared_ptr<GameWorld>& GameWorldManager::GetWorld(int id)
+shared_ptr<GameWorld> GameWorldManager::GetWorld(int id)
 {
 	lock_guard<mutex> lock(_lock);
 

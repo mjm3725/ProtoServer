@@ -14,9 +14,9 @@ class ISession
 public:
 	virtual int64_t GetHandle() = 0;
 	virtual void Send(const char* data, int size) = 0;
-	virtual TCPServer& GetServer() = 0;
+	virtual TCPServer* GetServer() = 0;
 	virtual void SetSessionState(shared_ptr<ISessionState>& sessionState) = 0;
-	virtual ISessionState& GetSessionState() = 0;
+	virtual ISessionState* GetSessionState() = 0;
 };
 
 class Session : public ISession, public enable_shared_from_this<Session>
@@ -35,9 +35,9 @@ public:
 	void Send(const char* data, int size) override;
 
 	int64_t GetHandle() override;
-	TCPServer& GetServer() override;
+	TCPServer* GetServer() override;
 	void SetSessionState(shared_ptr<ISessionState>& sessionState) override;
-	ISessionState& GetSessionState() override;
+	ISessionState* GetSessionState() override;
 	
 private:
 	void AsyncSend();
@@ -49,6 +49,6 @@ private:
 	asio::streambuf _sendBuf;
 	mutex _sendBufLock;
 	int64_t _handle;
-	TCPServer& _server;
+	TCPServer* _server;
 	shared_ptr<ISessionState> _sessionState;
 };

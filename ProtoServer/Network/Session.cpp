@@ -6,12 +6,12 @@
 Session::Session(int64_t handle, tcp::socket& socket, TCPServer& server, const function<void(shared_ptr<Session>&, error_code&)>& onClosed)
 	: _handle(handle), 
 	_socket(std::move(socket)), 
-	_server(server),
+	_server(&server),
 	_onClosed(onClosed)
 {
 }
 
-TCPServer& Session::GetServer()
+TCPServer* Session::GetServer()
 {
 	return _server;
 }
@@ -21,9 +21,9 @@ void Session::SetSessionState(shared_ptr<ISessionState>& sessionState)
 	_sessionState = sessionState;
 }
 
-ISessionState & Session::GetSessionState()
+ISessionState* Session::GetSessionState()
 {
-	return *_sessionState;
+	return _sessionState.get();
 }
 
 int64_t Session::GetHandle()
@@ -96,11 +96,11 @@ void Session::AsyncRecv()
 		{
 			session->_recvBuf.commit(bytesTransferred);
 
-			int read_size = session->_server.GetProtocolFilter()->Parse(session->_recvBuf.data());
+			int read_size = session->_server->GetProtocolFilter()->Parse(session->_recvBuf.data());
 
 			if (read_size > 0)
 			{
-				session->GetServer().OnRecv(static_pointer_cast<ISession>(session), session->_recvBuf.data(), read_size);
+				session->_server->OnRecv(static_pointer_cast<ISession>(session), session->_recvBuf.data(), read_size);
 
 				session->_recvBuf.consume(read_size);
 			}

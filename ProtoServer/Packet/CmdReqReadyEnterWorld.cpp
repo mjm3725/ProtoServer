@@ -8,16 +8,16 @@ atomic_int CmdReqReadyEnterWorld::_handleSeq = 0;
 
 void CmdReqReadyEnterWorld::ExecuteCommand(shared_ptr<ISession>& session, shared_ptr<ReqReadyEnterWorld>& message)
 {
-	auto playerState = (PlayerState&)session->GetSessionState();
+	auto playerState = (PlayerState*)session->GetSessionState();
 
-	playerState.State = PlayerStateType::Ready;
+	playerState->State = PlayerStateType::Ready;
 	
 	__int64 handle = ++_handleSeq;
 	char name[50];
 	_i64toa_s(handle, name, 50, 10);
 
-	playerState.GameObject = make_shared<GameObject>(handle, (string)name);
-	playerState.GameObject->SetSession(session);
+	playerState->GameObject = make_shared<GameObject>(handle, (string)name);
+	playerState->GameObject->SetSession(session);
 
 	ResReadyEnterWorld res;
 	res.set_result(PacketResult::SUCCESS);

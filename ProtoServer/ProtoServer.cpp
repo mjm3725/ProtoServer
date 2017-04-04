@@ -39,7 +39,7 @@ int main()
 
 	server.OnClosed = [](shared_ptr<ISession>& session, error_code& errorCode)
 	{
-		((PlayerState&)session->GetSessionState()).Dispose();
+		((PlayerState*)session->GetSessionState())->Dispose();
 
 		LogHelper::GetInstance()->GetConsoleLogger()->info("closed");
 	};

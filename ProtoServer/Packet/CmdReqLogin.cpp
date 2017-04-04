@@ -7,9 +7,9 @@
 
 void CmdReqLogin::ExecuteCommand(shared_ptr<ISession>& session, shared_ptr<ReqLogin>& message)
 {
-	auto playerState = (PlayerState&)session->GetSessionState();
+	auto playerState = (PlayerState*)session->GetSessionState();
 
-	playerState.State = PlayerStateType::Logined;
+	playerState->State = PlayerStateType::Logined;
 
 	ResLogin res;
 	res.set_result(PacketResult::SUCCESS);
